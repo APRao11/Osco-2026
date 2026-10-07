@@ -1,56 +1,105 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import FilterControls from '../components/FilterControls';
 import ProductGrid from '../components/ProductGrid';
 import SearchBar from '../components/SearchBar';
 import SectionHeading from '../components/SectionHeading';
-import { crafts } from '../data/crafts';
-import { products } from '../data/products';
 
 export default function CraftCategoryPage() {
   const { craftId } = useParams();
-  const craft = crafts.find((item) => item.id === craftId) ?? crafts[0];
-
+  const [craft, setCraft] = useState(null);
+  const [crafts, setCrafts] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [query, setQuery] = useState('');
-  const [selectedCraft, setSelectedCraft] = useState(craft.id);
+  const [selectedCraft, setSelectedCraft] = useState(craftId);
   const [priceRange, setPriceRange] = useState('all');
   const [sortOrder, setSortOrder] = useState('featured');
 
   useEffect(() => {
-    setSelectedCraft(craft.id);
-  }, [craft.id]);
+    let ignore = false;
 
-  const visibleProducts = useMemo(() => {
-    const baseProducts = products.filter((product) => {
-      const matchesCraft = selectedCraft === 'all' ? true : product.craftId === selectedCraft;
-      const matchesQuery =
-        !query ||
-        product.name.toLowerCase().includes(query.toLowerCase()) ||
-        product.artisanName.toLowerCase().includes(query.toLowerCase()) ||
-        product.location.toLowerCase().includes(query.toLowerCase()) ||
-        crafts
-          .find((item) => item.id === product.craftId)
-          ?.name.toLowerCase()
-          .includes(query.toLowerCase());
+    async function loadCollection() {
+      setLoading(true);
+      setError('');
 
-      let matchesPrice = true;
-      if (priceRange === 'under-2000') matchesPrice = product.price < 2000;
-      if (priceRange === '2000-5000') matchesPrice = product.price >= 2000 && product.price <= 5000;
-      if (priceRange === 'above-5000') matchesPrice = product.price > 5000;
+      try {
+        const [craftResponse, craftsResponse, productsResponse] = await Promise.all([
+          fetch(`http://localhost:3000/api/crafts/${craftId}`),
+          fetch('http://localhost:3000/api/crafts'),
+          fetch('http://localhost:3000/api/products'),
+        ]);
 
-      return matchesCraft && matchesQuery && matchesPrice;
-    });
+        if (!craftResponse.ok || !craftsResponse.ok || !productsResponse.ok) {
+          throw new Error('Could not load this craft collection.');
+        }
 
-    const sortedProducts = [...baseProducts];
-    if (sortOrder === 'low-to-high') {
-      sortedProducts.sort((a, b) => a.price - b.price);
+        const [craftData, craftsData, productsData] = await Promise.all([
+          craftResponse.json(),
+          craftsResponse.json(),
+          productsResponse.json(),
+        ]);
+
+        if (!ignore) {
+          setCraft(craftData);
+          setCrafts(craftsData);
+          setProducts(
+            productsData.map((product) => ({
+              ...product,
+              craftId: product.craft_id,
+              craftName: product.craft_name ?? '',
+              artisanName: product.artisan_name ?? '',
+              location: product.location ?? '',
+            }))
+          );
+        }
+      } catch (err) {
+        if (!ignore) setError(err.message);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
     }
-    if (sortOrder === 'high-to-low') {
-      sortedProducts.sort((a, b) => b.price - a.price);
-    }
 
-    return sortedProducts;
-  }, [query, selectedCraft, priceRange, sortOrder]);
+    setSelectedCraft(craftId);
+    loadCollection();
+    return () => {
+      ignore = true;
+    };
+  }, [craftId]);
+
+  const baseProducts = products.filter((product) => {
+    const matchesCraft = selectedCraft === 'all' || String(product.craftId) === selectedCraft;
+    const matchesQuery =
+      !query ||
+      product.name.toLowerCase().includes(query.toLowerCase()) ||
+      product.artisanName.toLowerCase().includes(query.toLowerCase()) ||
+      product.location.toLowerCase().includes(query.toLowerCase()) ||
+      product.craftName.toLowerCase().includes(query.toLowerCase());
+
+    let matchesPrice = true;
+    if (priceRange === 'under-2000') matchesPrice = product.price < 2000;
+    if (priceRange === '2000-5000') matchesPrice = product.price >= 2000 && product.price <= 5000;
+    if (priceRange === 'above-5000') matchesPrice = product.price > 5000;
+
+    return matchesCraft && matchesQuery && matchesPrice;
+  });
+
+  const visibleProducts = [...baseProducts];
+  if (sortOrder === 'low-to-high') {
+    visibleProducts.sort((a, b) => a.price - b.price);
+  }
+  if (sortOrder === 'high-to-low') {
+    visibleProducts.sort((a, b) => b.price - a.price);
+  }
+
+  if (loading) {
+    return <main className="container section-block"><div className="empty-state">Loading craft collection...</div></main>;
+  }
+
+  if (error || !craft) {
+    return <main className="container section-block"><div className="empty-state">{error || 'Craft not found.'}</div></main>;
+  }
 
   return (
     <main className="container section-block">

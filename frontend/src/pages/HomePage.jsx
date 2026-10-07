@@ -1,13 +1,45 @@
+import { useEffect, useState } from 'react';
 import Hero from '../components/Hero';
 import CraftGrid from '../components/CraftGrid';
 import SectionHeading from '../components/SectionHeading';
-import { crafts } from '../data/crafts';
 
 export default function HomePage() {
+  const [crafts, setCrafts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadCrafts() {
+      try {
+        const response = await fetch('http://localhost:3000/api/crafts');
+        if (!response.ok) throw new Error('Could not load crafts.');
+        const data = await response.json();
+        if (!ignore) setCrafts(data);
+      } catch (err) {
+        if (!ignore) setError(err.message);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+
+    loadCrafts();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   return (
     <>
       <Hero />
-      <CraftGrid crafts={crafts} />
+      {loading ? (
+        <p className="container section-block">Loading crafts...</p>
+      ) : error ? (
+        <p className="container section-block">{error}</p>
+      ) : (
+        <CraftGrid crafts={crafts} />
+      )}
 
       <section className="container section-block discovery-panel">
         <SectionHeading
