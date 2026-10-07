@@ -1,9 +1,4 @@
-import { Link, NavLink } from 'react-router-dom';
-
-const navItems = [
-  { label: 'Home', to: '/' },
-  { label: 'Explore Crafts', to: '/#explore' },
-];
+import { Link } from 'react-router-dom';
 
 export default function Navbar() {
   return (
@@ -12,17 +7,7 @@ export default function Navbar() {
         <Link className="brand" to="/" aria-label="CoastalCrafts home">
           CoastalCrafts
         </Link>
-        <div className="nav-links">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </div>
+        <span className="nav-caption">A coastal craft gallery</span>
       </nav>
     </header>
   );

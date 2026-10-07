@@ -1,17 +1,28 @@
-export default function FilterControls({ craftOptions, selectedCraft, priceRange, sortOrder, onCraftChange, onPriceChange, onSortChange }) {
+export default function FilterControls({
+  craftOptions = [],
+  selectedCraft,
+  priceRange,
+  sortOrder,
+  onCraftChange,
+  onPriceChange,
+  onSortChange,
+  showCraft = true,
+}) {
   return (
-    <div className="filter-controls">
-      <label>
-        <span>Craft</span>
-        <select value={selectedCraft} onChange={(event) => onCraftChange(event.target.value)}>
-          <option value="all">All crafts</option>
-          {craftOptions.map((craft) => (
-            <option key={craft.id} value={craft.id}>
-              {craft.name}
-            </option>
-          ))}
-        </select>
-      </label>
+    <div className={`filter-controls${showCraft ? '' : ' filter-controls-compact'}`}>
+      {showCraft ? (
+        <label>
+          <span>Craft</span>
+          <select value={selectedCraft} onChange={(event) => onCraftChange(event.target.value)}>
+            <option value="all">All crafts</option>
+            {craftOptions.map((craft) => (
+              <option key={craft.id} value={craft.id}>
+                {craft.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
 
       <label>
         <span>Price</span>

@@ -3,7 +3,7 @@ export const crafts = [
     id: 'kasuti',
     name: 'Kasuti Embroidery',
     description:
-      'Intricate hand-stitched stories inspired by Karnataka traditions and coastal heritage.',
+      'Traditional hand embroidery featuring intricate geometric motifs and patterns passed down through generations.',
     image:
       'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80',
   },
@@ -11,39 +11,39 @@ export const crafts = [
     id: 'beedu',
     name: 'Beedu Craft',
     description:
-      'Sacred motifs and handcrafted techniques passed through generations of makers.',
+      'Traditional coastal craftwork inspired by local culture, sacred motifs, and techniques passed down through generations.',
     image:
       'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=80',
   },
   {
     id: 'wooden',
-    name: 'Wooden Craft & Furniture',
+    name: 'Udupi Wood Carving',
     description:
-      'Warm, sculpted pieces that celebrate the artistry of coastal woodwork and design.',
+      'Intricately carved wooden pieces reflecting the craftsmanship and cultural heritage of coastal Karnataka.',
     image:
       'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
   },
   {
     id: 'palm',
-    name: 'Palm & Natural-Fibre Crafts',
+    name: 'Uttara Kannada Sandalwood Carving',
     description:
-      'Earthy, practical heirlooms woven from natural fibres and time-honoured craft.',
+      'Intricate sandalwood carvings from Uttara Kannada, showcasing traditional craftsmanship through detailed floral, figurative, and decorative designs.',
     image:
       'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=900&q=80',
   },
   {
     id: 'textiles',
-    name: 'Traditional Textiles',
+    name: 'Coastal Handloom',
     description:
-      'Textured weaves and dyed fabrics that carry the rhythm of the shoreline and the region.',
+      'Handwoven textiles and sarees created by local weaving communities, carrying the traditions of coastal Karnataka.',
     image:
       'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80',
   },
   {
     id: 'coastal',
-    name: 'Other Coastal Crafts',
+    name: 'Kaavi Art',
     description:
-      'A varied collection of small-batch crafts shaped by coastal culture and daily rituals.',
+      'Traditional red-and-white decorative art associated with temples and heritage structures along the coastal region.',
     image:
       'https://images.unsplash.com/photo-1522383225653-115be1b0c7d6?auto=format&fit=crop&w=900&q=80',
   },

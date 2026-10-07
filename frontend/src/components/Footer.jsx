@@ -8,7 +8,7 @@ export default function Footer() {
         </div>
         <div className="footer-links">
           <a href="/#explore">Explore</a>
-          <a href="/crafts/kasuti">Collections</a>
+          <a href="/crafts/kasuti-embroidery">Collections</a>
         </div>
       </div>
     </footer>

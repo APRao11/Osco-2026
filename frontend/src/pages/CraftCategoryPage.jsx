@@ -1,28 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import FilterControls from '../components/FilterControls';
+import MarketplaceToolbar from '../components/MarketplaceToolbar';
 import ProductGrid from '../components/ProductGrid';
-import SearchBar from '../components/SearchBar';
 import SectionHeading from '../components/SectionHeading';
 import { crafts } from '../data/crafts';
+import { getCraftSlug } from '../data/craftRoutes';
 import { products } from '../data/products';
 
 export default function CraftCategoryPage() {
-  const { craftId } = useParams();
-  const craft = crafts.find((item) => item.id === craftId) ?? crafts[0];
+  const { craftSlug } = useParams();
+  const craft =
+    crafts.find((item) => getCraftSlug(item) === craftSlug) ??
+    crafts.find((item) => item.id === craftSlug) ??
+    crafts[0];
 
   const [query, setQuery] = useState('');
-  const [selectedCraft, setSelectedCraft] = useState(craft.id);
   const [priceRange, setPriceRange] = useState('all');
   const [sortOrder, setSortOrder] = useState('featured');
 
-  useEffect(() => {
-    setSelectedCraft(craft.id);
-  }, [craft.id]);
-
   const visibleProducts = useMemo(() => {
     const baseProducts = products.filter((product) => {
-      const matchesCraft = selectedCraft === 'all' ? true : product.craftId === selectedCraft;
+      const matchesCraft = product.craftId === craft.id;
       const matchesQuery =
         !query ||
         product.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -50,10 +48,22 @@ export default function CraftCategoryPage() {
     }
 
     return sortedProducts;
-  }, [query, selectedCraft, priceRange, sortOrder]);
+  }, [craft.id, query, priceRange, sortOrder]);
 
   return (
-    <main className="container section-block">
+    <main className="container section-block category-page">
+      <MarketplaceToolbar
+        query={query}
+        onQueryChange={setQuery}
+        placeholder={`Search ${craft.name} products or artisans`}
+        ariaLabel={`Search ${craft.name} products or artisans`}
+        priceRange={priceRange}
+        onPriceChange={setPriceRange}
+        sortOrder={sortOrder}
+        onSortChange={setSortOrder}
+        showCraft={false}
+      />
+
       <div className="category-hero">
         <div className="category-hero-copy">
           <p className="eyebrow">Craft collection</p>
@@ -61,19 +71,6 @@ export default function CraftCategoryPage() {
           <p>{craft.description}</p>
         </div>
         <img src={craft.image} alt={craft.name} />
-      </div>
-
-      <div className="catalogue-tools">
-        <SearchBar value={query} onChange={setQuery} />
-        <FilterControls
-          craftOptions={crafts}
-          selectedCraft={selectedCraft}
-          priceRange={priceRange}
-          sortOrder={sortOrder}
-          onCraftChange={(value) => setSelectedCraft(value)}
-          onPriceChange={setPriceRange}
-          onSortChange={setSortOrder}
-        />
       </div>
 
       <div className="catalogue-header-row">

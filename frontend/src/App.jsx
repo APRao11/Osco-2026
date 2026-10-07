@@ -12,7 +12,7 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/crafts/:craftId" element={<CraftCategoryPage />} />
+        <Route path="/crafts/:craftSlug" element={<CraftCategoryPage />} />
         <Route path="/products/:productId" element={<ProductRoutePlaceholder />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
