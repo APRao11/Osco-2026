@@ -1,11 +1,9 @@
-import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
 const navItems = [
   { label: 'Home', to: '/' },
   { label: 'Explore Crafts', to: '/#explore' },
 ];
-
 export default function Navbar() {
   return (
     <header className="site-header">
@@ -27,6 +25,7 @@ export default function Navbar() {
             Artisan Studio
           </NavLink>
         </div>
+        <span className="nav-caption">A coastal craft gallery</span>
       </nav>
     </header>
   );

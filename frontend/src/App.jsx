@@ -146,7 +146,7 @@ export default function App() {
       {!location.pathname.startsWith('/artisan') && <Navbar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/crafts/:craftId" element={<CraftCategoryPage />} />
+        <Route path="/crafts/:craftSlug" element={<CraftCategoryPage />} />
         <Route path="/products/:productId" element={<ProductRoutePlaceholder />} />
         <Route path="/artisan/*" element={<ArtisanWorkspace />} />
         <Route path="*" element={<Navigate to="/" replace />} />

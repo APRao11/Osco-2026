@@ -1,46 +1,171 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 import CraftGrid from '../components/CraftGrid';
+import MarketplaceToolbar from '../components/MarketplaceToolbar';
+import ProductGrid from '../components/ProductGrid';
 import SectionHeading from '../components/SectionHeading';
+import { crafts as sampleCrafts } from '../data/crafts';
+import { getCraftSlug } from '../data/craftRoutes';
+import { products as sampleProducts } from '../data/products';
 
 export default function HomePage() {
   const [crafts, setCrafts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [query, setQuery] = useState('');
+  const [selectedCraft, setSelectedCraft] = useState('all');
+  const [priceRange, setPriceRange] = useState('all');
+  const [sortOrder, setSortOrder] = useState('featured');
 
   useEffect(() => {
     let ignore = false;
 
-    async function loadCrafts() {
+    async function loadMarketplace() {
       try {
-        const response = await fetch('http://localhost:3000/api/crafts');
-        if (!response.ok) throw new Error('Could not load crafts.');
-        const data = await response.json();
-        if (!ignore) setCrafts(data);
-      } catch (err) {
-        if (!ignore) setError(err.message);
+        const [craftResponse, productResponse] = await Promise.all([
+          fetch('http://localhost:3000/api/crafts'),
+          fetch('http://localhost:3000/api/products'),
+        ]);
+        if (!craftResponse.ok || !productResponse.ok) {
+          throw new Error('Could not load live marketplace data.');
+        }
+
+        const [craftData, productData] = await Promise.all([
+          craftResponse.json(),
+          productResponse.json(),
+        ]);
+        const normalizedProducts = productData.map((product) => {
+          const craft = craftData.find(
+            (item) => String(item.id) === String(product.craft_id ?? product.craftId),
+          );
+          return {
+            ...product,
+            craftId: product.craft_id ?? product.craftId,
+            craftName: product.craft_name ?? product.craftName ?? craft?.name ?? '',
+            artisanName: product.artisan_name ?? product.artisanName ?? '',
+            location: product.location ?? craft?.location ?? '',
+            price: Number(product.price),
+          };
+        });
+
+        if (!ignore) {
+          setCrafts(craftData);
+          setProducts(normalizedProducts);
+        }
+      } catch {
+        if (!ignore) {
+          const fallbackProducts = sampleProducts.map((product) => {
+            const craft = sampleCrafts.find((item) => item.id === product.craftId);
+            return { ...product, craftName: craft?.name ?? '' };
+          });
+          setCrafts(sampleCrafts);
+          setProducts(fallbackProducts);
+          setError('Live marketplace data is unavailable. Showing sample listings.');
+        }
       } finally {
         if (!ignore) setLoading(false);
       }
     }
 
-    loadCrafts();
+    loadMarketplace();
     return () => {
       ignore = true;
     };
   }, []);
 
+  const normalizedQuery = query.trim().toLowerCase();
+  const matchingCrafts = useMemo(
+    () =>
+      normalizedQuery
+        ? crafts.filter((craft) =>
+            `${craft.name} ${craft.description}`.toLowerCase().includes(normalizedQuery),
+          )
+        : [],
+    [crafts, normalizedQuery],
+  );
+
+  const visibleProducts = useMemo(() => {
+    const filtered = products.filter((product) => {
+      const craft = crafts.find((item) => String(item.id) === String(product.craftId));
+      const matchesCraft = selectedCraft === 'all' || String(product.craftId) === selectedCraft;
+      const matchesQuery =
+        !normalizedQuery ||
+        `${product.name} ${product.artisanName} ${product.location} ${craft?.name ?? ''} ${craft?.description ?? ''}`
+          .toLowerCase()
+          .includes(normalizedQuery);
+      const matchesPrice =
+        priceRange === 'all' ||
+        (priceRange === 'under-2000' && product.price < 2000) ||
+        (priceRange === '2000-5000' && product.price >= 2000 && product.price <= 5000) ||
+        (priceRange === 'above-5000' && product.price > 5000);
+
+      return matchesCraft && matchesQuery && matchesPrice;
+    });
+
+    if (sortOrder === 'low-to-high') return filtered.sort((a, b) => a.price - b.price);
+    if (sortOrder === 'high-to-low') return filtered.sort((a, b) => b.price - a.price);
+    return filtered;
+  }, [crafts, products, normalizedQuery, selectedCraft, priceRange, sortOrder]);
+
   return (
     <>
+      <section className="container homepage-toolbar-wrap" aria-label="Marketplace discovery tools">
+        <MarketplaceToolbar
+          query={query}
+          onQueryChange={setQuery}
+          placeholder="Search crafts, products, or artisans"
+          ariaLabel="Search crafts, products, or artisans"
+          craftOptions={crafts}
+          selectedCraft={selectedCraft}
+          onCraftChange={setSelectedCraft}
+          priceRange={priceRange}
+          onPriceChange={setPriceRange}
+          sortOrder={sortOrder}
+          onSortChange={setSortOrder}
+        />
+        {normalizedQuery && matchingCrafts.length > 0 ? (
+          <div className="matching-crafts" aria-live="polite">
+            <span>Craft collections</span>
+            {matchingCrafts.map((craft) => (
+              <Link key={craft.id} to={`/crafts/${getCraftSlug(craft)}`}>
+                {craft.name}
+                <span aria-hidden="true"> ↗</span>
+              </Link>
+            ))}
+          </div>
+        ) : null}
+      </section>
+
       <Hero />
+      {error ? <p className="container marketplace-notice" role="status">{error}</p> : null}
       {loading ? (
         <p className="container section-block">Loading crafts...</p>
-      ) : error ? (
-        <p className="container section-block">{error}</p>
       ) : (
         <CraftGrid crafts={crafts} />
       )}
+
+      <section className="container section-block home-product-section">
+        <div className="catalogue-header-row">
+          <SectionHeading
+            eyebrow={normalizedQuery ? 'Search results' : 'Browse the marketplace'}
+            title={
+              normalizedQuery
+                ? `${visibleProducts.length} ${visibleProducts.length === 1 ? 'piece' : 'pieces'} found`
+                : 'Handmade finds'
+            }
+            description="Explore pieces from coastal Karnataka and select a product to continue to its details."
+          />
+        </div>
+        {visibleProducts.length > 0 ? (
+          <ProductGrid products={visibleProducts} />
+        ) : (
+          <div className="empty-state" aria-live="polite">
+            <p>No products match your search or filters. Try another term or broaden your filters.</p>
+          </div>
+        )}
+      </section>
 
       <section className="container section-block discovery-panel">
         <SectionHeading
