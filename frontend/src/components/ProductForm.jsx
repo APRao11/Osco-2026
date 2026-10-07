@@ -6,8 +6,7 @@ import { ImageUpload } from './ImageUpload.jsx';
 import { ProductDetailModal } from './ProductDetailModal.jsx';
 
 // shared input look, so we don't repeat this long class string everywhere
-const inputStyle =
-  'w-full text-xs p-3 rounded-lg border border-[#D8C7B2] bg-white focus:outline-none focus:ring-1 focus:ring-[#6B4632] text-[#2F2924]';
+const inputStyle = 'artisan-field-input';
 
 const today = () => new Date().toISOString().split('T')[0];
 
@@ -22,21 +21,21 @@ const emptyStory = {
 // label + input/textarea/select + error message in one reusable piece
 function Field({ label, icon: Icon, required, error, prefix, as: Tag = 'input', children, ...props }) {
   return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-semibold text-[#2F2924] flex items-center gap-1.5">
-        {Icon && <Icon className="w-3.5 h-3.5 text-[#6B4632]" />}
-        {label} {required && <span className="text-[#6B4632]">*</span>}
+    <div className="artisan-product-field">
+      <label className="artisan-field-label artisan-field-label-with-icon">
+        {Icon && <Icon className="artisan-icon artisan-icon-small artisan-icon-primary" />}
+        {label} {required && <span className="artisan-required-mark">*</span>}
       </label>
-      <div className="relative">
-        {prefix && <span className="absolute left-3 top-3 text-xs text-[#756A60] font-semibold">{prefix}</span>}
+      <div className={`artisan-product-input-wrap ${prefix ? 'has-prefix' : ''}`}>
+        {prefix && <span className="artisan-input-prefix">{prefix}</span>}
         <Tag
-          className={`${inputStyle} ${prefix ? 'pl-7' : ''} ${Tag === 'textarea' ? 'resize-none' : ''}`}
+          className={`${inputStyle} ${Tag === 'textarea' ? 'artisan-field-textarea' : ''}`}
           {...props}
         >
           {children}
         </Tag>
       </div>
-      {error && <p className="text-[11px] text-rose-700">{error}</p>}
+      {error && <p className="artisan-field-error">{error}</p>}
     </div>
   );
 }
@@ -190,24 +189,24 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
   };
 
   const previewBtn = (
-    <button type="button" onClick={() => setPreviewOpen(true)} className="btn-secondary text-xs">
-      <Eye className="w-4 h-4" /> Preview Piece
+    <button type="button" onClick={() => setPreviewOpen(true)} className="btn-secondary artisan-small-button">
+      <Eye className="artisan-icon" /> Preview Piece
     </button>
   );
   const publishBtn = (
-    <button type="button" onClick={() => handleSubmit('published')} className="btn-primary text-xs">
-      <Save className="w-4 h-4" /> {isEditing ? 'Save Changes' : 'Publish Product'}
+    <button type="button" onClick={() => handleSubmit('published')} className="btn-primary artisan-small-button">
+      <Save className="artisan-icon" /> {isEditing ? 'Save Changes' : 'Publish Product'}
     </button>
   );
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="artisan-product-form">
       {toast && (
-        <div className="fixed top-6 right-6 z-50 bg-[#6B4632] text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 border border-[#A68A64]">
-          <CheckCircle className="w-5 h-5 text-emerald-400" />
+        <div className="artisan-save-toast">
+          <CheckCircle className="artisan-icon artisan-icon-success" />
           <div>
-            <p className="text-xs font-semibold">{isEditing ? 'Product Updated Successfully' : 'Product Saved Successfully'}</p>
-            <p className="text-[11px] text-[#EFE4D3]">
+            <p className="artisan-small-strong">{isEditing ? 'Product Updated Successfully' : 'Product Saved Successfully'}</p>
+            <p className="artisan-toast-caption">
               {toast === 'published' ? 'Now available in your catalog' : 'Saved as draft'}
             </p>
           </div>
@@ -215,32 +214,32 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
       )}
 
       {/* header: back button, title and the main actions */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-[#FFF9F0] p-4 sm:p-6 rounded-xl border border-[#D8C7B2]">
-        <div className="flex items-center gap-3">
+      <div className="artisan-product-form-heading">
+        <div className="artisan-product-title-group">
           <button
             type="button"
             onClick={onCancel}
             title="Return to products"
-            className="p-2 rounded-lg text-[#756A60] hover:text-[#2F2924] hover:bg-[#EFE4D3] transition-colors"
+            className="artisan-back-button"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="artisan-icon artisan-icon-large" />
           </button>
           <div>
-            <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#6B4632]">
+            <h2 className="artisan-heading-secondary">
               {isEditing ? `Edit: ${p?.name || 'Craft Product'}` : 'Add New Coastal Craft Product'}
             </h2>
-            <p className="text-xs text-[#756A60]">
+            <p className="artisan-muted artisan-small-text">
               {isEditing ? 'Update product details and the craft story.' : 'Document and publish a handmade coastal craft item.'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="artisan-form-heading-actions">
           {previewBtn}
           <button
             type="button"
             onClick={() => handleSubmit('draft')}
-            className="text-xs font-semibold text-[#6B4632] bg-[#EFE4D3] hover:bg-[#E2D4BF] px-3.5 py-2.5 rounded-lg border border-[#D8C7B2] transition-colors"
+            className="artisan-button artisan-button-draft"
           >
             Save as Draft
           </button>
@@ -250,11 +249,11 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
 
       {/* list of everything that failed validation */}
       {Object.keys(errors).length > 0 && (
-        <div className="bg-rose-50 border border-rose-300 p-4 rounded-xl text-rose-900 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-rose-700 shrink-0 mt-0.5" />
-          <div className="text-xs space-y-1">
-            <p className="font-semibold">Please complete the required details before publishing:</p>
-            <ul className="list-disc list-inside text-rose-800">
+        <div className="artisan-validation-banner">
+          <AlertCircle className="artisan-icon artisan-validation-icon" />
+          <div className="artisan-validation-copy">
+            <p className="artisan-small-strong">Please complete the required details before publishing:</p>
+            <ul className="artisan-validation-list">
               {Object.values(errors).map((msg) => (
                 <li key={msg}>{msg}</li>
               ))}
@@ -264,10 +263,10 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
       )}
 
       {/* general product info */}
-      <div className="card p-6 sm:p-8 space-y-6">
-        <div className="border-b border-[#D8C7B2]/70 pb-3">
-          <h3 className="text-base font-serif font-bold text-[#6B4632]">General Product Information</h3>
-          <p className="text-xs text-[#756A60]">Details shown to buyers browsing the catalog.</p>
+      <div className="card artisan-product-section">
+        <div className="artisan-section-heading">
+          <h3 className="artisan-section-heading-title">General Product Information</h3>
+          <p className="artisan-muted artisan-small-text">Details shown to buyers browsing the catalog.</p>
         </div>
 
         <Field
@@ -278,7 +277,7 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
           placeholder="e.g. Handwoven Coconut Palm Harvest Basket"
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="artisan-product-details-grid">
           <Field {...bind('category')} as="select" label="Craft Category" icon={Layers} required>
             {craftCategories.map((cat) => (
               <option key={cat} value={cat}>
@@ -322,27 +321,25 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
               setErrors((prev) => ({ ...prev, image: '' })); // clear the error once a photo is added
             }}
           />
-          {errors.image && <p className="text-[11px] text-rose-700 mt-1">{errors.image}</p>}
+          {errors.image && <p className="artisan-field-error artisan-image-error">{errors.image}</p>}
         </div>
 
         {/* draft / published switch */}
-        <div className="pt-2 border-t border-[#D8C7B2]/70 flex items-center justify-between">
+        <div className="artisan-publish-settings">
           <div>
-            <p className="text-xs font-semibold text-[#2F2924]">Publishing State</p>
-            <p className="text-[11px] text-[#756A60]">Publish immediately or keep it as a draft.</p>
+            <p className="artisan-field-label">Publishing State</p>
+            <p className="artisan-muted artisan-tiny-text">Publish immediately or keep it as a draft.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="artisan-publish-options">
             {[
-              ['draft', 'Draft Only', 'bg-amber-100 text-amber-900 border-amber-300'],
-              ['published', 'Published', 'bg-emerald-800 text-white border-emerald-700'],
+              ['draft', 'Draft Only', 'artisan-status-option-draft'],
+              ['published', 'Published', 'artisan-status-option-published'],
             ].map(([value, text, activeStyle]) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => set('status', value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-                  form.status === value ? activeStyle : 'bg-white text-[#756A60] border-[#D8C7B2] hover:bg-[#EFE4D3]'
-                }`}
+                className={`artisan-status-option ${activeStyle} ${form.status === value ? 'is-selected' : ''}`}
               >
                 {text}
               </button>
@@ -355,11 +352,11 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
       <CraftStory data={form.craftStory} onChange={setStory} productName={form.name} />
 
       {/* bottom actions, handy after scrolling a long form */}
-      <div className="card p-6 bg-[#FFF9F0] border border-[#D8C7B2] flex flex-wrap items-center justify-between gap-4">
-        <button type="button" onClick={onCancel} className="btn-secondary text-xs">
+      <div className="card artisan-form-footer">
+        <button type="button" onClick={onCancel} className="btn-secondary artisan-small-button">
           Cancel
         </button>
-        <div className="flex items-center gap-3">
+        <div className="artisan-action-row">
           {previewBtn}
           {publishBtn}
         </div>

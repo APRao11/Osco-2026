@@ -8,7 +8,7 @@ export function EditProduct({
   onCancel,
 }) {
   return (
-    <div className="py-2">
+    <div className="artisan-product-page">
       <ProductForm
         initialProduct={product}
         artisan={artisan}

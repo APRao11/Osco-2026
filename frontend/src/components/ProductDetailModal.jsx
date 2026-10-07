@@ -20,72 +20,68 @@ export function ProductDetailModal({ product, artisan, isOpen, onClose, onEdit }
   const isPublished = product.status === 'published';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2F2924]/60 backdrop-blur-xs overflow-y-auto">
-      <div className="card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl border-2 border-[#D8C7B2] bg-[#FFF9F0] my-auto">
+    <div className="artisan-modal-backdrop">
+      <div className="card artisan-modal">
         {/* sticky header so the close button is always reachable */}
-        <div className="p-4 sm:p-5 border-b border-[#D8C7B2] bg-[#F5EBDD] flex items-center justify-between sticky top-0 z-10">
+        <div className="artisan-modal-header">
           <div>
-            <span className="text-[11px] uppercase tracking-wider font-semibold text-[#8A6248]">
+            <span className="artisan-modal-eyebrow">
               Product & Craft Story View
             </span>
-            <h3 className="text-lg font-serif font-bold text-[#6B4632]">{product.name}</h3>
+            <h3 className="artisan-modal-title">{product.name}</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#756A60] hover:text-[#2F2924] hover:bg-[#EFE4D3] transition-colors"
+            className="artisan-icon-button"
           >
-            <X className="w-5 h-5" />
+            <X className="artisan-icon artisan-icon-large" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="artisan-modal-body">
           {/* photo on the left, details on the right */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            <div className="rounded-xl overflow-hidden border border-[#D8C7B2] bg-[#EFE4D3]/40 aspect-[4/3]">
-              <img src={product.image || fallbackImage} alt={product.name} className="w-full h-full object-cover" />
+          <div className="artisan-modal-product-grid">
+            <div className="artisan-modal-photo-wrap">
+              <img src={product.image || fallbackImage} alt={product.name} />
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#EFE4D3] text-[#6B4632] border border-[#D8C7B2]">
+            <div className="artisan-modal-product-details">
+              <div className="artisan-modal-badges">
+                <span className="artisan-category-badge-inline">
                   {product.category}
                 </span>
                 <span
-                  className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
-                    isPublished
-                      ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                      : 'bg-amber-100 text-amber-900 border-amber-300'
-                  }`}
+                  className={`artisan-status-badge ${isPublished ? 'is-published-light' : 'is-draft'}`}
                 >
                   {isPublished ? 'Published' : 'Draft'}
                 </span>
               </div>
 
               <div>
-                <div className="text-2xl font-serif font-bold text-[#6B4632]">${Number(product.price).toFixed(2)}</div>
+                <div className="artisan-modal-price">${Number(product.price).toFixed(2)}</div>
                 {product.stock !== undefined && (
-                  <p className="text-xs text-[#756A60] mt-0.5 flex items-center gap-1">
-                    <Package className="w-3.5 h-3.5" /> Stock: {product.stock} units
+                  <p className="artisan-muted artisan-small-text">
+                    <Package className="artisan-icon" /> Stock: {product.stock} units
                   </p>
                 )}
               </div>
 
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#756A60]">Description</h4>
-                <p className="text-xs text-[#2F2924] mt-1 leading-relaxed">{product.description}</p>
+                <h4 className="artisan-small-heading">Description</h4>
+                <p className="artisan-modal-description">{product.description}</p>
               </div>
 
               {/* maker info, only if we know who made it */}
               {artisan && (
-                <div className="pt-3 border-t border-[#D8C7B2]/70 flex items-center gap-3">
+                <div className="artisan-modal-maker">
                   <img
                     src={artisan.photo}
                     alt={artisan.name}
-                    className="w-9 h-9 rounded-full object-cover border border-[#D8C7B2]"
+                    className="artisan-avatar"
                   />
                   <div>
-                    <p className="text-xs font-semibold text-[#2F2924]">{artisan.name}</p>
-                    <p className="text-[11px] text-[#756A60]">{artisan.location}</p>
+                    <p className="artisan-maker-name">{artisan.name}</p>
+                    <p className="artisan-muted artisan-small-text">{artisan.location}</p>
                   </div>
                 </div>
               )}
@@ -93,49 +89,49 @@ export function ProductDetailModal({ product, artisan, isOpen, onClose, onEdit }
           </div>
 
           {/* craft story of this piece */}
-          <div className="rounded-xl border border-[#D8C7B2] bg-[#F5EBDD]/60 p-5 space-y-4">
-            <div className="flex items-center gap-2 border-b border-[#D8C7B2]/80 pb-3">
-              <Sparkles className="w-4 h-4 text-[#6B4632]" />
-              <h4 className="text-base font-serif font-bold text-[#6B4632]">Craft Story of This Individual Piece</h4>
+          <div className="artisan-story-panel">
+            <div className="artisan-story-heading">
+              <Sparkles className="artisan-icon" />
+              <h4>Craft Story of This Individual Piece</h4>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="artisan-story-grid">
               {storyCards.map(({ key, title, icon: Icon, fallback }) => (
-                <div key={key} className="bg-[#FFF9F0] p-3 rounded-lg border border-[#D8C7B2]/80 space-y-1">
-                  <span className="text-[11px] font-bold text-[#8A6248] uppercase tracking-wider flex items-center gap-1">
-                    <Icon className="w-3 h-3" /> {title}
+                <div key={key} className="artisan-story-card">
+                  <span className="artisan-story-card-title">
+                    <Icon className="artisan-icon artisan-icon-small" /> {title}
                   </span>
-                  <p className="text-xs text-[#2F2924] leading-relaxed">{story[key] || fallback}</p>
+                  <p>{story[key] || fallback}</p>
                 </div>
               ))}
             </div>
 
             {/* skip this box entirely if the maker hasn't written a story */}
             {story.storyBehindCraft && (
-              <div className="bg-[#FFF9F0] p-3.5 rounded-lg border border-[#D8C7B2]/80 space-y-1">
-                <span className="text-[11px] font-bold text-[#6B4632] uppercase tracking-wider block">
+              <div className="artisan-story-card artisan-story-full">
+                <span className="artisan-story-card-title">
                   The Story Behind The Craft
                 </span>
-                <p className="text-xs text-[#2F2924] leading-relaxed italic">&ldquo;{story.storyBehindCraft}&rdquo;</p>
+                <p className="artisan-story-quote">&ldquo;{story.storyBehindCraft}&rdquo;</p>
               </div>
             )}
           </div>
         </div>
 
         {/* footer actions */}
-        <div className="p-4 bg-[#F5EBDD] border-t border-[#D8C7B2] flex items-center justify-end gap-3">
+        <div className="artisan-modal-footer">
           {onEdit && (
             <button
               onClick={() => {
                 onClose();
                 onEdit(product);
               }}
-              className="btn-secondary text-xs"
+              className="btn-secondary"
             >
               Edit Product
             </button>
           )}
-          <button onClick={onClose} className="btn-primary text-xs">
+          <button onClick={onClose} className="btn-primary">
             Close
           </button>
         </div>

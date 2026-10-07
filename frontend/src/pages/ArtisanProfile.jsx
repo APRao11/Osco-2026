@@ -17,30 +17,26 @@ export function ArtisanProfile({
   const showPreview = () => setActiveTab('preview');
 
   return (
-    <div className="space-y-6">
+    <div className="artisan-profile-page">
       {/* Header and Switcher */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#D8C7B2] pb-3">
+      <div className="artisan-profile-page-heading">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#6B4632]">
+          <h1 className="artisan-page-title">
             Artisan Profile & Maker Story
           </h1>
-          <p className="text-xs text-[#756A60]">
+          <p className="artisan-muted artisan-small-text">
             Manage your personal profile and preview how buyers see &quot;Meet the Maker&quot;.
           </p>
         </div>
 
-        <div className="flex items-center gap-1 bg-[#EFE4D3] p-1 rounded-xl border border-[#D8C7B2]">
+        <div className="artisan-profile-tabs">
           {TABS.map(({ id, label, Icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                activeTab === id
-                  ? 'bg-[#6B4632] text-white shadow-xs'
-                  : 'text-[#2F2924] hover:text-[#6B4632]'
-              }`}
+              className={`artisan-profile-tab ${activeTab === id ? 'is-active' : ''}`}
             >
-              <Icon className="w-3.5 h-3.5" />
+              <Icon className="artisan-icon artisan-icon-small" />
               {label}
             </button>
           ))}
@@ -54,13 +50,13 @@ export function ArtisanProfile({
           onPreviewMeetTheMaker={showPreview}
         />
       ) : (
-        <div className="space-y-6 max-w-4xl mx-auto">
-          <div className="p-4 bg-[#EFE4D3]/70 rounded-xl border border-[#D8C7B2] flex items-center justify-between text-xs">
-            <span className="text-[#756A60]">
-              <strong className="text-[#2F2924]">Public Buyer View:</strong> This is how your &quot;Meet the Maker&quot; story is presented to patrons on the marketplace.
+        <div className="artisan-profile-preview">
+          <div className="artisan-preview-note">
+            <span className="artisan-muted">
+              <strong className="artisan-text-strong">Public Buyer View:</strong> This is how your &quot;Meet the Maker&quot; story is presented to patrons on the marketplace.
             </span>
-            <button onClick={showEdit} className="btn-secondary text-xs">
-              <Edit3 className="w-3.5 h-3.5" />
+            <button onClick={showEdit} className="btn-secondary artisan-small-button">
+              <Edit3 className="artisan-icon artisan-icon-small" />
               Edit Profile
             </button>
           </div>

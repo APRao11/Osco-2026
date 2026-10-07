@@ -25,59 +25,59 @@ export function ArtisanDashboard({
   if (!artisan.phone) profileCompletion -= 5;
 
   return (
-    <div className="space-y-7">
+    <div className="artisan-dashboard">
       {/* Artisan Welcome Banner */}
-      <div className="card bg-[#FFF9F0] border border-[#D8C7B2] p-6 sm:p-7 shadow-xs">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-            <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-[#D8C7B2] bg-[#EFE4D3] shrink-0">
+      <div className="card artisan-dashboard-welcome">
+        <div className="artisan-welcome-inner">
+          <div className="artisan-welcome-profile">
+            <div className="artisan-welcome-photo">
               <img
                 src={artisan.photo}
                 alt={artisan.name}
-                className="w-full h-full object-cover"
+                className="artisan-cover-image"
               />
             </div>
 
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#EFE4D3] text-[#6B4632] border border-[#D8C7B2]">
+            <div className="artisan-welcome-copy">
+              <div className="artisan-welcome-meta">
+                <span className="artisan-workshop-badge">
                   Coastal Workshop
                 </span>
-                <span className="text-xs text-[#756A60] flex items-center gap-1 font-medium">
-                  <MapPin className="w-3.5 h-3.5 text-[#8A6248]" />
+                <span className="artisan-location-label">
+                  <MapPin className="artisan-icon artisan-icon-small artisan-icon-primary-light" />
                   {artisan.location}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#6B4632]">
+              <h1 className="artisan-dashboard-title">
                 Welcome back, {artisan.name}
               </h1>
-              <p className="text-xs sm:text-sm text-[#756A60] leading-relaxed">
-                Speciality: <strong className="text-[#2F2924]">{artisan.craftSpeciality}</strong> &bull; {artisan.yearsOfExperience} years of craft mastery.
+              <p className="artisan-welcome-description">
+                Speciality: <strong className="artisan-text-strong">{artisan.craftSpeciality}</strong> &bull; {artisan.yearsOfExperience} years of craft mastery.
               </p>
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+          <div className="artisan-quick-actions">
             <button
               onClick={() => onNavigate('add-product')}
-              className="btn-primary text-xs flex-1 sm:flex-none"
+              className="btn-primary artisan-dashboard-action"
             >
-              <PlusCircle className="w-4 h-4" />
+              <PlusCircle className="artisan-icon" />
               Add Product
             </button>
             <button
               onClick={() => onNavigate('manage-products')}
-              className="btn-secondary text-xs flex-1 sm:flex-none"
+              className="btn-secondary artisan-dashboard-action"
             >
-              <Package className="w-4 h-4" />
+              <Package className="artisan-icon" />
               Manage Products
             </button>
             <button
               onClick={() => onNavigate('profile')}
-              className="text-xs font-semibold text-[#6B4632] bg-[#EFE4D3] hover:bg-[#E2D4BF] px-3.5 py-2.5 rounded-lg border border-[#D8C7B2] flex items-center gap-1.5 transition-colors"
+              className="artisan-button artisan-button-draft artisan-dashboard-action"
             >
-              <Edit3 className="w-4 h-4" />
+              <Edit3 className="artisan-icon" />
               Edit Profile
             </button>
           </div>
@@ -85,61 +85,61 @@ export function ArtisanDashboard({
       </div>
 
       {/* Practical Overview Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="artisan-stats-grid">
         {/* Total Products */}
-        <div className="card p-5 bg-[#FFF9F0] border-[#D8C7B2] space-y-1.5">
-          <div className="flex items-center justify-between text-[#756A60]">
-            <span className="text-xs font-bold uppercase tracking-wider">Total Products</span>
-            <Package className="w-4 h-4 text-[#6B4632]" />
+        <div className="card artisan-stat-card">
+          <div className="artisan-stat-heading">
+            <span className="artisan-eyebrow">Total Products</span>
+            <Package className="artisan-icon artisan-icon-primary" />
           </div>
-          <div className="text-3xl font-serif font-bold text-[#6B4632]">
+          <div className="artisan-stat-value">
             {products.length}
           </div>
-          <p className="text-[11px] text-[#756A60]">
+          <p className="artisan-muted artisan-tiny-text">
             Craft items in your studio catalog
           </p>
         </div>
 
         {/* Published Products */}
-        <div className="card p-5 bg-[#FFF9F0] border-[#D8C7B2] space-y-1.5">
-          <div className="flex items-center justify-between text-[#756A60]">
-            <span className="text-xs font-bold uppercase tracking-wider">Published</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+        <div className="card artisan-stat-card">
+          <div className="artisan-stat-heading">
+            <span className="artisan-eyebrow">Published</span>
+            <CheckCircle2 className="artisan-icon artisan-icon-success" />
           </div>
-          <div className="text-3xl font-serif font-bold text-emerald-800">
+          <div className="artisan-stat-value artisan-stat-value-success">
             {publishedProducts.length}
           </div>
-          <p className="text-[11px] text-[#756A60]">
+          <p className="artisan-muted artisan-tiny-text">
             Visible to marketplace buyers
           </p>
         </div>
 
         {/* Draft Products */}
-        <div className="card p-5 bg-[#FFF9F0] border-[#D8C7B2] space-y-1.5">
-          <div className="flex items-center justify-between text-[#756A60]">
-            <span className="text-xs font-bold uppercase tracking-wider">Draft Products</span>
-            <FileText className="w-4 h-4 text-amber-700" />
+        <div className="card artisan-stat-card">
+          <div className="artisan-stat-heading">
+            <span className="artisan-eyebrow">Draft Products</span>
+            <FileText className="artisan-icon artisan-icon-warning" />
           </div>
-          <div className="text-3xl font-serif font-bold text-amber-900">
+          <div className="artisan-stat-value artisan-stat-value-warning">
             {draftProducts.length}
           </div>
-          <p className="text-[11px] text-[#756A60]">
+          <p className="artisan-muted artisan-tiny-text">
             Studio drafts in progress
           </p>
         </div>
 
         {/* Profile Status */}
-        <div className="card p-5 bg-[#FFF9F0] border-[#D8C7B2] space-y-1.5">
-          <div className="flex items-center justify-between text-[#756A60]">
-            <span className="text-xs font-bold uppercase tracking-wider">Profile Status</span>
-            <span className="text-xs text-emerald-700 font-semibold">{profileCompletion}% Complete</span>
+        <div className="card artisan-stat-card">
+          <div className="artisan-stat-heading">
+            <span className="artisan-eyebrow">Profile Status</span>
+            <span className="artisan-completion-label">{profileCompletion}% Complete</span>
           </div>
-          <div className="text-3xl font-serif font-bold text-[#6B4632]">
+          <div className="artisan-stat-value">
             Active
           </div>
-          <div className="w-full bg-[#EFE4D3] h-1.5 rounded-full overflow-hidden mt-1">
+          <div className="artisan-completion-track">
             <div
-              className="bg-[#6B4632] h-full rounded-full"
+              className="artisan-completion-fill"
               style={{ width: `${profileCompletion}%` }}
             />
           </div>
@@ -147,153 +147,149 @@ export function ArtisanDashboard({
       </div>
 
       {/* Main Two-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="artisan-dashboard-columns">
         {/* Artisan Profile Summary */}
-        <div className="card p-6 bg-[#FFF9F0] border-[#D8C7B2] space-y-4 h-fit">
-          <div className="border-b border-[#D8C7B2]/70 pb-3 flex items-center justify-between">
-            <h3 className="font-serif font-bold text-base text-[#6B4632]">
+        <div className="card artisan-profile-summary">
+          <div className="artisan-summary-heading">
+            <h3 className="artisan-summary-title">
               Artisan Profile Summary
             </h3>
             <button
               onClick={() => onNavigate('profile')}
-              className="text-xs text-[#8A6248] hover:text-[#6B4632] font-semibold underline"
+              className="artisan-text-link"
             >
               Edit Profile
             </button>
           </div>
 
-          <div className="space-y-3">
-            <p className="text-xs text-[#2F2924] leading-relaxed italic bg-[#F5EBDD]/60 p-3 rounded-lg border-l-2 border-[#6B4632]">
+          <div className="artisan-summary-content">
+            <p className="artisan-summary-bio">
               &ldquo;{artisan.bio}&rdquo;
             </p>
 
-            <div className="space-y-2 text-xs">
+            <div className="artisan-summary-details">
               <div>
-                <span className="text-[11px] text-[#756A60] font-semibold uppercase tracking-wider block">
+                <span className="artisan-detail-label">
                   Workshop:
                 </span>
-                <span className="font-medium text-[#2F2924]">
+                <span className="artisan-text-strong">
                   {artisan.workshopName || 'Heritage Workshop'}
                 </span>
               </div>
 
               <div>
-                <span className="text-[11px] text-[#756A60] font-semibold uppercase tracking-wider block">
+                <span className="artisan-detail-label">
                   Craft Lineage:
                 </span>
-                <p className="text-[#756A60] line-clamp-3 leading-relaxed mt-0.5">
+                <p className="artisan-summary-lineage">
                   {artisan.craftBackground}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-[#D8C7B2]/70">
+          <div className="artisan-summary-footer">
             <button
               onClick={() => onNavigate('profile')}
-              className="w-full btn-secondary text-xs justify-center"
+              className="btn-secondary artisan-full-button"
             >
-              <Compass className="w-3.5 h-3.5" />
+              <Compass className="artisan-icon artisan-icon-small" />
               View &quot;Meet the Maker&quot;
             </button>
           </div>
         </div>
 
         {/* Recent Products */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="artisan-recent-products">
+          <div className="artisan-recent-heading">
             <div>
-              <h2 className="text-xl font-serif font-bold text-[#6B4632]">
+              <h2 className="artisan-section-heading-title artisan-recent-title">
                 Your Coastal Craft Catalog
               </h2>
-              <p className="text-xs text-[#756A60]">
+              <p className="artisan-muted artisan-small-text">
                 Recent items published or drafted in your artisan studio.
               </p>
             </div>
             <button
               onClick={() => onNavigate('manage-products')}
-              className="text-xs font-semibold text-[#6B4632] hover:text-[#8A6248] flex items-center gap-1"
+              className="artisan-view-all-link"
             >
               <span>View All ({products.length})</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="artisan-icon artisan-icon-small" />
             </button>
           </div>
 
           {products.length === 0 ? (
-            <div className="card p-10 text-center bg-[#FFF9F0] border-[#D8C7B2] space-y-3">
-              <Package className="w-10 h-10 text-[#6B4632]/50 mx-auto" />
-              <div className="space-y-1">
-                <h3 className="font-serif font-bold text-base text-[#2F2924]">
+            <div className="card artisan-empty-products">
+              <Package className="artisan-empty-icon" />
+              <div className="artisan-empty-copy">
+                <h3 className="artisan-empty-title">
                   No craft pieces added yet
                 </h3>
-                <p className="text-xs text-[#756A60] max-w-sm mx-auto">
+                <p className="artisan-muted artisan-small-text artisan-empty-description">
                   Add your first coastal craft item with its authentic craft story.
                 </p>
               </div>
               <button
                 onClick={() => onNavigate('add-product')}
-                className="btn-primary text-xs"
+                className="btn-primary artisan-small-button"
               >
-                <PlusCircle className="w-4 h-4" />
+                <PlusCircle className="artisan-icon" />
                 Add First Product
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="artisan-recent-grid">
               {products.slice(0, 4).map((product) => {
                 const isPublished = product.status === 'published';
                 return (
                   <div
                     key={product.id}
-                    className="card p-3.5 bg-[#FFF9F0] border-[#D8C7B2] flex flex-col justify-between hover:border-[#A68A64] transition-colors"
+                    className="card artisan-recent-product-card"
                   >
-                    <div className="flex gap-3">
-                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-[#EFE4D3] shrink-0 border border-[#D8C7B2]">
+                    <div className="artisan-recent-product-main">
+                      <div className="artisan-recent-product-image">
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="w-full h-full object-cover"
+                          className="artisan-cover-image"
                         />
                       </div>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <div className="flex items-center justify-between gap-1">
-                          <span className="text-[10px] uppercase font-bold text-[#8A6248] truncate">
+                      <div className="artisan-recent-product-copy">
+                        <div className="artisan-recent-product-meta">
+                          <span className="artisan-product-category-label">
                             {product.category}
                           </span>
                           <span
-                            className={`text-[10px] font-semibold px-2 py-0.2 rounded-full ${
-                              isPublished
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : 'bg-amber-100 text-amber-900'
-                            }`}
+                            className={`artisan-status-badge ${isPublished ? 'is-published' : 'is-draft'}`}
                           >
                             {isPublished ? 'Published' : 'Draft'}
                           </span>
                         </div>
-                        <h4 className="font-serif font-bold text-xs text-[#2F2924] truncate">
+                        <h4 className="artisan-recent-product-title">
                           {product.name}
                         </h4>
-                        <div className="text-xs font-serif font-bold text-[#6B4632]">
+                        <div className="artisan-recent-product-price">
                           ${Number(product.price).toFixed(2)}
                         </div>
-                        <p className="text-[10px] text-[#756A60] line-clamp-1 italic">
+                        <p className="artisan-recent-product-technique">
                           Craft Story: {product.craftStory?.technique || 'Handmade'}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-3 pt-2.5 border-t border-[#D8C7B2]/70 flex items-center justify-between gap-2">
+                    <div className="artisan-recent-product-actions">
                       <button
                         onClick={() => onViewProduct(product)}
-                        className="text-[11px] font-semibold text-[#6B4632] hover:underline"
+                        className="artisan-text-link artisan-tiny-link"
                       >
                         View Story
                       </button>
                       <button
                         onClick={() => onEditProduct(product)}
-                        className="text-[11px] font-semibold text-[#2F2924] hover:text-[#6B4632] flex items-center gap-1 px-2 py-1 rounded bg-[#EFE4D3]/60 hover:bg-[#EFE4D3]"
+                        className="artisan-button artisan-recent-edit-button"
                       >
-                        <Edit3 className="w-3 h-3" />
+                        <Edit3 className="artisan-icon artisan-icon-tiny" />
                         Edit
                       </button>
                     </div>
