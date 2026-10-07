@@ -1,3 +1,4 @@
+import React from 'react';
 import { Anchor, LayoutDashboard, LogOut, Menu, Package, PlusCircle, User, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';

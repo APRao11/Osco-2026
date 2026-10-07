@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function FilterControls({ craftOptions, selectedCraft, priceRange, sortOrder, onCraftChange, onPriceChange, onSortChange }) {
   return (
     <div className="filter-controls">

@@ -1,3 +1,4 @@
+import React from 'react';
 import { X, Feather, Sparkles, Compass, Clock, Package } from 'lucide-react';
 
 const fallbackImage =

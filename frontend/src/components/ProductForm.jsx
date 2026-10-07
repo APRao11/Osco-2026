@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import { Save, Eye, AlertCircle, DollarSign, Package, Layers, ArrowLeft, CheckCircle } from 'lucide-react';
 import { craftCategories } from '../data/mockData.jsx';

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Edit2, Eye, Layers, Trash2 } from 'lucide-react';
 
 const fallbackImage =

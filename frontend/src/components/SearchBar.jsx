@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function SearchBar({ value, onChange, placeholder = 'Search products...' }) {
   return (
     <label className="search-bar" aria-label="Search products">
