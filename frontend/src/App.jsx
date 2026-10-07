@@ -1,122 +1,196 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import { initialArtisanProfile, initialProducts } from './data/mockData.jsx';
+import { Navbar } from './components/Navbar.jsx';
+import { ProductDetailModal } from './components/ProductDetailModal.jsx';
+import { ArtisanLogin } from './pages/ArtisanLogin.jsx';
+import { ArtisanDashboard } from './pages/ArtisanDashboard.jsx';
+import { ArtisanProfile } from './pages/ArtisanProfile.jsx';
+import { AddProduct } from './pages/AddProduct.jsx';
+import { EditProduct } from './pages/EditProduct.jsx';
+import { ManageProducts } from './pages/ManageProducts.jsx';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function Footer() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <footer className="mt-auto border-t border-[#D8C7B2] bg-[#FFF9F0] py-6 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#756A60]">
 
-      <div className="ticks"></div>
+        <div className="flex items-center gap-2">
+          <span className="font-serif font-bold text-[#6B4632]">
+            Tide & Timber
+          </span>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <span>
+            &mdash; Coastal Crafts Marketplace &bull; Artisan Studio
+          </span>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <div className="flex items-center gap-4 text-[11px]">
+          <span>Handcrafted Heritage</span>
+          <span>&bull;</span>
+          <span>Natural Fibers & Tidal Drift Materials</span>
+        </div>
+
+      </div>
+    </footer>
+  );
 }
 
-export default App
+export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [currentPage, setCurrentPage] = useState('dashboard');
+
+  const [artisan, setArtisan] = useState(initialArtisanProfile);
+  const [products, setProducts] = useState(initialProducts);
+
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [viewingProduct, setViewingProduct] = useState(null);
+
+  const goToManageProducts = () => {
+    setCurrentPage('manage-products');
+  };
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setCurrentPage('dashboard');
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setCurrentPage('login');
+  };
+
+  const handleSaveProduct = (savedProduct) => {
+    setProducts((prev) => {
+      const index = prev.findIndex(
+        (p) => p.id === savedProduct.id
+      );
+
+      if (index === -1) {
+        return [savedProduct, ...prev];
+      }
+
+      const updated = [...prev];
+      updated[index] = savedProduct;
+
+      return updated;
+    });
+
+    setEditingProduct(null);
+    goToManageProducts();
+  };
+
+  const handleDeleteProduct = (productId) => {
+    setProducts((prev) =>
+      prev.filter((p) => p.id !== productId)
+    );
+  };
+
+  const handleStartEditProduct = (product) => {
+    setEditingProduct(product);
+    setCurrentPage('edit-product');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    goToManageProducts();
+  };
+
+  // Login page
+  if (!isLoggedIn) {
+    return (
+      <ArtisanLogin
+        onLogin={handleLogin}
+        artisanName={artisan.name}
+        artisanEmail={artisan.email}
+      />
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F5EBDD] text-[#2F2924] flex flex-col font-sans">
+
+      {/* Navigation */}
+      <Navbar
+        currentPage={currentPage}
+        onNavigate={(page) => {
+          if (page !== 'edit-product') {
+            setCurrentPage(page);
+          }
+        }}
+        artisan={artisan}
+        onLogout={handleLogout}
+        productCount={products.length}
+      />
+
+      {/* Main Content */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        {/* Dashboard */}
+        {currentPage === 'dashboard' && (
+          <ArtisanDashboard
+            artisan={artisan}
+            products={products}
+            onNavigate={setCurrentPage}
+            onEditProduct={handleStartEditProduct}
+            onViewProduct={setViewingProduct}
+          />
+        )}
+
+        {/* Profile */}
+        {currentPage === 'profile' && (
+          <ArtisanProfile
+            artisan={artisan}
+            onSaveProfile={setArtisan}
+          />
+        )}
+
+        {/* Add Product */}
+        {currentPage === 'add-product' && (
+          <AddProduct
+            artisan={artisan}
+            onSaveProduct={handleSaveProduct}
+            onCancel={goToManageProducts}
+          />
+        )}
+
+        {/* Edit Product */}
+        {currentPage === 'edit-product' && editingProduct && (
+          <EditProduct
+            product={editingProduct}
+            artisan={artisan}
+            onSaveProduct={handleSaveProduct}
+            onCancel={handleCancelEdit}
+          />
+        )}
+
+        {/* Manage Products */}
+        {currentPage === 'manage-products' && (
+          <ManageProducts
+            products={products}
+            artisan={artisan}
+            onAddProduct={() => setCurrentPage('add-product')}
+            onEditProduct={handleStartEditProduct}
+            onDeleteProduct={handleDeleteProduct}
+          />
+        )}
+
+      </main>
+
+      {/* Product Details Modal */}
+      <ProductDetailModal
+        product={viewingProduct}
+        artisan={artisan}
+        isOpen={!!viewingProduct}
+        onClose={() => setViewingProduct(null)}
+        onEdit={(prod) => {
+          setViewingProduct(null);
+          handleStartEditProduct(prod);
+        }}
+      />
+
+      {/* Footer */}
+      <Footer />
+
+    </div>
+  );
+}

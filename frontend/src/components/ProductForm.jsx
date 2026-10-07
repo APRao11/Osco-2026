@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Save, Eye, AlertCircle, DollarSign, Package, Layers, ArrowLeft, CheckCircle } from 'lucide-react';
-import { craftCategories } from '../data/mockData.js';
+import { craftCategories } from '../data/mockData.jsx';
 import { ImageUpload } from './ImageUpload.jsx';
 import { ProductDetailModal } from './ProductDetailModal.jsx';
 
