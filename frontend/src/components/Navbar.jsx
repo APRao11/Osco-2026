@@ -22,6 +22,9 @@ export default function Navbar() {
               {item.label}
             </NavLink>
           ))}
+          <NavLink to="/artisan/login" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            Artisan Studio
+          </NavLink>
         </div>
       </nav>
     </header>
