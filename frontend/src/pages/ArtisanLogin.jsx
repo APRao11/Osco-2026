@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Anchor, Sparkles, Key, Mail, ArrowRight } from 'lucide-react';
+import { Key, Mail, ArrowRight } from 'lucide-react';
 
 const DEMO_PASSWORD = 'coastal-crafts';
 
-const INPUT_CLASS = 'artisan-login-input';
+const INPUT_CLASS =
+  'w-full text-xs pl-9 pr-3 py-3 rounded-lg border border-[#D8C7B2] bg-white focus:outline-none focus:ring-1 focus:ring-[#6B4632] text-[#2F2924]';
 
 export function ArtisanLogin({
   onLogin,
-  artisanName = 'Meera Nambiar',
   artisanEmail = 'meera.crafts@coastalheritage.org',
 }) {
   const [email, setEmail] = useState(artisanEmail);
@@ -31,50 +31,41 @@ export function ArtisanLogin({
     }, 300);
   };
 
-  const handleQuickDemo = () => {
-    setEmail(artisanEmail);
-    setPassword(DEMO_PASSWORD);
-    onLogin();
-  };
-
   return (
-    <div className="artisan-login-page">
-      <div className="artisan-login-content">
+    <div className="min-h-screen flex flex-col justify-center items-center px-4 py-12 bg-[#F5EBDD]">
+      <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
-        <div className="artisan-login-brand">
-          <div className="artisan-login-mark">
-            <Anchor className="artisan-login-mark-icon" />
-          </div>
-          <span className="artisan-login-eyebrow">
-            Coastal Crafts Marketplace
+        <div className="text-center space-y-2">
+          <span className="text-[11px] uppercase tracking-widest text-[#756A60] font-semibold block">
+            Coastal Crafts
           </span>
-          <h1 className="artisan-login-title">
-            Artisan Studio Login
+          <h1 className="text-3xl font-serif font-bold text-[#6B4632]">
+            Artisan Login
           </h1>
-          <p className="artisan-login-description">
+          <p className="text-xs text-[#756A60] max-w-xs mx-auto">
             Sign in to manage your workshop, craft stories, and handmade catalog.
           </p>
         </div>
 
         {/* Login Form Card */}
-        <div className="card artisan-login-card">
-          <form onSubmit={handleSubmit} className="artisan-login-form">
+        <div className="card p-6 sm:p-8 shadow-xs border-[#D8C7B2]">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="artisan-login-error">
+              <div className="p-3 rounded-lg bg-rose-50 border border-rose-300 text-rose-800 text-xs">
                 {error}
               </div>
             )}
 
-            <div className="artisan-login-field">
+            <div className="space-y-1.5">
               <label
                 htmlFor="artisan-email"
-                className="artisan-field-label"
+                className="block text-xs font-semibold text-[#2F2924]"
               >
                 Artisan Email / Username
               </label>
-              <div className="artisan-login-input-wrap">
-                <span className="artisan-login-input-icon">
-                  <Mail className="artisan-icon" />
+              <div className="relative">
+                <span className="absolute left-3 top-3 text-[#756A60]">
+                  <Mail className="w-4 h-4" />
                 </span>
                 <input
                   id="artisan-email"
@@ -87,16 +78,16 @@ export function ArtisanLogin({
               </div>
             </div>
 
-            <div className="artisan-login-field">
+            <div className="space-y-1.5">
               <label
                 htmlFor="artisan-password"
-                className="artisan-field-label"
+                className="block text-xs font-semibold text-[#2F2924]"
               >
                 Password
               </label>
-              <div className="artisan-login-input-wrap">
-                <span className="artisan-login-input-icon">
-                  <Key className="artisan-icon" />
+              <div className="relative">
+                <span className="absolute left-3 top-3 text-[#756A60]">
+                  <Key className="w-4 h-4" />
                 </span>
                 <input
                   id="artisan-password"
@@ -109,38 +100,23 @@ export function ArtisanLogin({
               </div>
             </div>
 
-            <div className="artisan-login-submit-wrap">
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn-primary artisan-login-submit"
+                className="btn-primary w-full text-xs py-3 font-semibold shadow-xs"
               >
                 {isLoading ? (
                   <span>Entering Studio...</span>
                 ) : (
                   <>
                     <span>Enter Artisan Studio</span>
-                    <ArrowRight className="artisan-icon" />
+                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
             </div>
           </form>
-
-          {/* Quick Demo Access */}
-          <div className="artisan-login-demo">
-            <p className="artisan-muted artisan-tiny-text">
-              Quick evaluation access:
-            </p>
-            <button
-              type="button"
-              onClick={handleQuickDemo}
-              className="artisan-button artisan-button-draft artisan-login-demo-button"
-            >
-              <Sparkles className="artisan-icon artisan-icon-accent" />
-              <span>Log in as {artisanName}</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
