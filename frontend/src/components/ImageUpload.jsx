@@ -66,27 +66,27 @@ export function ImageUpload({
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-[#2F2924]">
-          {label} <span className="text-[#6B4632]">*</span>
+    <div className="artisan-image-upload">
+      <div className="artisan-section-heading-row">
+        <label className="artisan-label artisan-label-large">
+          {label} <span className="artisan-required-mark">*</span>
         </label>
         <button
           type="button"
           onClick={() => setShowSamples(!showSamples)}
-          className="text-xs text-[#6B4632] hover:text-[#8A6248] flex items-center gap-1 font-medium underline underline-offset-2"
+          className="artisan-text-button"
         >
-          <Sparkles className="w-3.5 h-3.5" />
+          <Sparkles className="artisan-icon" />
           {showSamples ? 'Hide craft samples' : 'Pick from sample craft photos'}
         </button>
       </div>
 
       {showSamples && (
-        <div className="p-3 bg-[#EFE4D3]/70 rounded-lg border border-[#D8C7B2]">
-          <p className="text-xs text-[#756A60] mb-2 font-medium">
+        <div className="artisan-sample-panel">
+          <p className="artisan-muted artisan-small-text">
             Click a sample craft photo to use it for your listing:
           </p>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          <div className="artisan-sample-grid">
             {SAMPLE_COASTAL_IMAGES.map((sample, idx) => (
               <button
                 type="button"
@@ -95,15 +95,15 @@ export function ImageUpload({
                   onImageChange(sample.url);
                   setShowSamples(false);
                 }}
-                className="group relative rounded-md overflow-hidden border border-[#D8C7B2] hover:border-[#6B4632] aspect-square transition-all"
+                className="artisan-sample-tile"
                 title={sample.name}
               >
                 <img
                   src={sample.url}
                   alt={sample.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  className="artisan-sample-image"
                 />
-                <span className="absolute inset-x-0 bottom-0 bg-[#2F2924]/80 text-[10px] text-white py-0.5 px-1 truncate block text-center">
+                <span className="artisan-sample-caption">
                   {sample.name}
                 </span>
               </button>
@@ -113,43 +113,43 @@ export function ImageUpload({
       )}
 
       {currentImage ? (
-        <div className="relative rounded-xl overflow-hidden border border-[#D8C7B2] bg-[#FFF9F0] group shadow-xs">
-          <div className="w-full aspect-[4/3] overflow-hidden flex items-center justify-center bg-[#EFE4D3]/40">
+        <div className="artisan-image-preview">
+          <div className="artisan-image-preview-frame">
             <img
               src={currentImage}
               alt="Craft preview"
-              className="w-full h-full object-cover object-center"
+              className="artisan-image-preview-photo"
             />
           </div>
 
-          <div className="absolute inset-0 bg-[#2F2924]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
+          <div className="artisan-image-overlay">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="bg-[#FFF9F0] text-[#6B4632] hover:bg-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow-md flex items-center gap-1.5 transition-colors"
+              className="artisan-button artisan-button-light"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
+              <RefreshCw className="artisan-icon" />
               Replace Photo
             </button>
             <button
               type="button"
               onClick={() => onImageChange('')}
-              className="bg-red-800 text-white hover:bg-red-700 px-3.5 py-2 rounded-lg text-xs font-semibold shadow-md flex items-center gap-1.5 transition-colors"
+              className="artisan-button artisan-button-danger"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="artisan-icon" />
               Remove
             </button>
           </div>
 
-          <div className="p-2.5 bg-[#FFF9F0] border-t border-[#D8C7B2] flex items-center justify-between text-xs text-[#756A60]">
-            <span className="flex items-center gap-1.5">
-              <ImageIcon className="w-3.5 h-3.5 text-[#6B4632]" />
+          <div className="artisan-image-status">
+            <span>
+              <ImageIcon className="artisan-icon" />
               Image selected & ready
             </span>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="text-[#6B4632] hover:underline font-medium"
+              className="artisan-inline-link"
             >
               Choose another
             </button>
@@ -164,22 +164,18 @@ export function ImageUpload({
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-            isDragging
-              ? 'border-[#6B4632] bg-[#EFE4D3]'
-              : 'border-[#D8C7B2] hover:border-[#8A6248] bg-[#FFF9F0]/70 hover:bg-[#FFF9F0]'
-          }`}
+          className={`artisan-dropzone ${isDragging ? 'is-dragging' : ''}`}
         >
-          <div className="w-12 h-12 rounded-full bg-[#EFE4D3] text-[#6B4632] flex items-center justify-center mx-auto mb-3 border border-[#D8C7B2]">
-            <Upload className="w-5 h-5" />
+          <div className="artisan-upload-icon">
+            <Upload className="artisan-icon artisan-icon-large" />
           </div>
-          <p className="text-sm font-semibold text-[#2F2924]">
+          <p className="artisan-dropzone-title">
             Click to upload an image from your device
           </p>
-          <p className="text-xs text-[#756A60] mt-1">
+          <p className="artisan-muted artisan-small-text">
             or drag and drop your photo here (JPG, PNG, WEBP)
           </p>
-          <div className="mt-3 inline-flex items-center text-xs font-medium text-[#6B4632] bg-[#EFE4D3]/60 px-2.5 py-1 rounded-md border border-[#D8C7B2]/70">
+          <div className="artisan-upload-hint">
             Clear natural lighting & craft detail view recommended
           </div>
         </div>
@@ -190,7 +186,7 @@ export function ImageUpload({
         type="file"
         accept="image/*"
         onChange={handleInputChange}
-        className="hidden"
+        className="artisan-visually-hidden"
       />
     </div>
   );

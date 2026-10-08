@@ -7,7 +7,7 @@ export function AddProduct({
   onCancel,
 }) {
   return (
-    <div className="animate-fadeIn py-2">
+    <div className="artisan-product-page artisan-product-page-enter">
       <ProductForm
         artisan={artisan}
         isEditing={false}
