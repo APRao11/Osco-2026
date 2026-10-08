@@ -36,9 +36,9 @@ export function ProductCard({ product, onEdit, onDelete, onViewDetails }) {
           {product.category}
         </span>
 
-        {/* price */}
+        {/* price (no currency symbol) */}
         <span className="absolute top-3 right-3 bg-[#FFF9F0] text-[#6B4632] font-serif font-bold text-sm px-2.5 py-1 rounded-lg border border-[#D8C7B2] shadow-xs">
-          ${Number(product.price).toFixed(2)}
+          {Number(product.price).toFixed(2)}
         </span>
       </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Anchor, Sparkles, Key, Mail, ArrowRight } from 'lucide-react';
+import { Key, Mail, ArrowRight } from 'lucide-react';
 
 const DEMO_PASSWORD = 'coastal-crafts';
 
@@ -8,7 +8,6 @@ const INPUT_CLASS =
 
 export function ArtisanLogin({
   onLogin,
-  artisanName = 'Meera Nambiar',
   artisanEmail = 'meera.crafts@coastalheritage.org',
 }) {
   const [email, setEmail] = useState(artisanEmail);
@@ -32,25 +31,16 @@ export function ArtisanLogin({
     }, 300);
   };
 
-  const handleQuickDemo = () => {
-    setEmail(artisanEmail);
-    setPassword(DEMO_PASSWORD);
-    onLogin();
-  };
-
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-4 py-12 bg-[#F5EBDD]">
       <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#6B4632] text-white shadow-xs mb-1 border-2 border-[#D8C7B2]">
-            <Anchor className="w-7 h-7 text-[#A68A64]" />
-          </div>
           <span className="text-[11px] uppercase tracking-widest text-[#756A60] font-semibold block">
-            Coastal Crafts Marketplace
+            Coastal Crafts
           </span>
           <h1 className="text-3xl font-serif font-bold text-[#6B4632]">
-            Artisan Studio Login
+            Artisan Login
           </h1>
           <p className="text-xs text-[#756A60] max-w-xs mx-auto">
             Sign in to manage your workshop, craft stories, and handmade catalog.
@@ -127,21 +117,6 @@ export function ArtisanLogin({
               </button>
             </div>
           </form>
-
-          {/* Quick Demo Access */}
-          <div className="mt-6 pt-5 border-t border-[#D8C7B2]/70 text-center space-y-2">
-            <p className="text-[11px] text-[#756A60]">
-              Quick evaluation access:
-            </p>
-            <button
-              type="button"
-              onClick={handleQuickDemo}
-              className="w-full py-2.5 px-3 rounded-lg bg-[#EFE4D3] hover:bg-[#E2D4BF] text-[#6B4632] text-xs font-semibold border border-[#D8C7B2] flex items-center justify-center gap-2 transition-colors"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#A68A64]" />
-              <span>Log in as {artisanName}</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>

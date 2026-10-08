@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { LayoutDashboard, User, PlusCircle, Package, LogOut, Menu, X, Anchor } from 'lucide-react';
+import { User, PlusCircle, Package, LogOut, Menu, X } from 'lucide-react';
 
-export function Navbar({ currentPage, onNavigate, artisan, onLogout, productCount }) {
+export function Navbar({ currentPage, onNavigate, artisan, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'profile', label: 'Artisan Profile', icon: User },
     { id: 'add-product', label: 'Add Product', icon: PlusCircle },
-    { id: 'manage-products', label: 'Manage Products', icon: Package, badge: productCount },
+    { id: 'manage-products', label: 'Manage Products', icon: Package },
   ];
 
   // go to a page and close the mobile menu if it was open
@@ -20,37 +19,20 @@ export function Navbar({ currentPage, onNavigate, artisan, onLogout, productCoun
   // "Manage Products" should stay highlighted while editing a product
   const isActive = (id) => currentPage === id || (id === 'manage-products' && currentPage === 'edit-product');
 
-  // small count bubble next to a nav label
-  const Badge = ({ count, active }) =>
-    count !== undefined && (
-      <span
-        className={`text-[10px] px-1.5 rounded-full font-bold ${
-          active ? 'bg-[#8A6248] text-white' : 'bg-[#EFE4D3] text-[#6B4632]'
-        }`}
-      >
-        {count}
-      </span>
-    );
-
   return (
     <header className="sticky top-0 z-40 bg-[#FFF9F0] border-b border-[#D8C7B2] shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 sm:h-20">
-        {/* logo / brand, links back to the dashboard */}
-        <button onClick={() => go('dashboard')} className="flex items-center gap-2.5 text-left group">
-          <div className="w-10 h-10 rounded-xl bg-[#6B4632] flex items-center justify-center shadow-xs group-hover:bg-[#8A6248] transition-colors">
-            <Anchor className="w-5 h-5 text-[#A68A64]" />
-          </div>
-          <div>
-            <span className="font-serif font-bold text-lg sm:text-xl text-[#6B4632] tracking-tight block leading-tight">
-              Tide & Timber
-            </span>
-            <span className="text-[11px] uppercase tracking-wider text-[#756A60] font-medium block">Artisan Studio</span>
-          </div>
+        {/* brand (text only), links back to Manage Products */}
+        <button onClick={() => go('manage-products')} className="text-left group">
+          <span className="font-serif font-bold text-lg sm:text-xl text-[#6B4632] tracking-tight block leading-tight group-hover:text-[#8A6248] transition-colors">
+            Coastal Craft
+          </span>
+          <span className="text-[11px] uppercase tracking-wider text-[#756A60] font-medium block">Artisan Studio</span>
         </button>
 
         {/* desktop links */}
         <nav className="hidden md:flex items-center gap-1">
-          {navItems.map(({ id, label, icon: Icon, badge }) => (
+          {navItems.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => go(id)}
@@ -60,7 +42,6 @@ export function Navbar({ currentPage, onNavigate, artisan, onLogout, productCoun
             >
               <Icon className={`w-4 h-4 ${isActive(id) ? 'text-[#A68A64]' : 'text-[#756A60]'}`} />
               {label}
-              <Badge count={badge} active={isActive(id)} />
             </button>
           ))}
         </nav>
@@ -118,7 +99,7 @@ export function Navbar({ currentPage, onNavigate, artisan, onLogout, productCoun
             </div>
           </div>
 
-          {navItems.map(({ id, label, icon: Icon, badge }) => (
+          {navItems.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => go(id)}
@@ -129,7 +110,6 @@ export function Navbar({ currentPage, onNavigate, artisan, onLogout, productCoun
               <span className="flex items-center gap-2.5">
                 <Icon className="w-4 h-4" /> {label}
               </span>
-              <Badge count={badge} active={isActive(id)} />
             </button>
           ))}
 

@@ -10,7 +10,6 @@ import {
   Mail,
   Phone,
   Store,
-  BookOpen,
   Calendar,
   Edit3,
   Anchor,
@@ -60,7 +59,7 @@ function Field({ label, name, value, onChange, icon: Icon, textarea, type = 'tex
 /* Profile form                                                        */
 /* ------------------------------------------------------------------ */
 
-export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
+export function ProfileForm({ initialProfile, onSave }) {
   const [profile, setProfile] = useState({ ...initialProfile });
   const [saved, setSaved] = useState(false);
 
@@ -86,9 +85,6 @@ export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
             <CheckCircle2 className="w-5 h-5 text-emerald-700" />
             Profile updated successfully!
           </span>
-          <button type="button" onClick={onPreviewMeetTheMaker} className="underline font-bold">
-            Preview Meet the Maker →
-          </button>
         </div>
       )}
 
@@ -99,9 +95,6 @@ export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
           <p className="text-xs text-[#756A60] mt-1">Tell buyers who you are and what goes into your craft.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={onPreviewMeetTheMaker} className="btn-secondary text-xs">
-            <BookOpen className="w-4 h-4" /> Preview
-          </button>
           <button type="submit" className="btn-primary text-xs">
             <Save className="w-4 h-4" /> Save Profile
           </button>

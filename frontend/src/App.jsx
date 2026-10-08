@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { initialArtisanProfile, initialProducts } from './data/mockData.jsx';
 import { Navbar } from './components/Navbar.jsx';
-import { ProductDetailModal } from './components/ProductDetailModal.jsx';
 import { ArtisanLogin } from './pages/ArtisanLogin.jsx';
-import { ArtisanDashboard } from './pages/ArtisanDashboard.jsx';
 import { ArtisanProfile } from './pages/ArtisanProfile.jsx';
 import { AddProduct } from './pages/AddProduct.jsx';
 import { EditProduct } from './pages/EditProduct.jsx';
@@ -37,13 +35,12 @@ function Footer() {
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState('manage-products');
 
   const [artisan, setArtisan] = useState(initialArtisanProfile);
   const [products, setProducts] = useState(initialProducts);
 
   const [editingProduct, setEditingProduct] = useState(null);
-  const [viewingProduct, setViewingProduct] = useState(null);
 
   const goToManageProducts = () => {
     setCurrentPage('manage-products');
@@ -51,7 +48,7 @@ export default function App() {
 
   const handleLogin = () => {
     setIsLoggedIn(true);
-    setCurrentPage('dashboard');
+    goToManageProducts();
   };
 
   const handleLogout = () => {
@@ -119,22 +116,10 @@ export default function App() {
         }}
         artisan={artisan}
         onLogout={handleLogout}
-        productCount={products.length}
       />
 
       {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-
-        {/* Dashboard */}
-        {currentPage === 'dashboard' && (
-          <ArtisanDashboard
-            artisan={artisan}
-            products={products}
-            onNavigate={setCurrentPage}
-            onEditProduct={handleStartEditProduct}
-            onViewProduct={setViewingProduct}
-          />
-        )}
 
         {/* Profile */}
         {currentPage === 'profile' && (
@@ -175,18 +160,6 @@ export default function App() {
         )}
 
       </main>
-
-      {/* Product Details Modal */}
-      <ProductDetailModal
-        product={viewingProduct}
-        artisan={artisan}
-        isOpen={!!viewingProduct}
-        onClose={() => setViewingProduct(null)}
-        onEdit={(prod) => {
-          setViewingProduct(null);
-          handleStartEditProduct(prod);
-        }}
-      />
 
       {/* Footer */}
       <Footer />

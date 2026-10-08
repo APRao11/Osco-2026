@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, Eye, AlertCircle, DollarSign, Package, Layers, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Save, Eye, AlertCircle, Tag, Package, Layers, ArrowLeft, CheckCircle } from 'lucide-react';
 import { craftCategories } from '../data/mockData.jsx';
 import { ImageUpload } from './ImageUpload.jsx';
 import { ProductDetailModal } from './ProductDetailModal.jsx';
@@ -40,71 +40,66 @@ function Field({ label, icon: Icon, required, error, prefix, as: Tag = 'input', 
   );
 }
 
-// story section (previously CraftStory.jsx), only used by ProductForm
-function CraftStory({ data, onChange, productName }) {
+// story section, only used by ProductForm (styled with the same Field + card look as the rest of the form)
+function CraftStory({ data, onChange, productName, errors = {} }) {
+  // value + onChange for one story field
+  const story = (field) => ({
+    value: data[field] || '',
+    onChange: (e) => onChange(field, e.target.value),
+  });
+
   return (
-    <div className="card craft-story">
-      <h3>Craft Story</h3>
-
-      <p className="story-intro">
-        Tell buyers how {productName || 'this product'} is made and what makes it special.
-      </p>
-
-      {/* How the product is made */}
-      <div className="form-group">
-        <label>How is it made? *</label>
-        <textarea
-          rows="3"
-          value={data.technique || ''}
-          onChange={(e) => onChange('technique', e.target.value)}
-          placeholder="Describe the traditional technique or process used."
-        />
+    <div className="card p-6 sm:p-8 space-y-6">
+      <div className="border-b border-[#D8C7B2]/70 pb-3">
+        <h3 className="text-base font-serif font-bold text-[#6B4632]">Craft Story</h3>
+        <p className="text-xs text-[#756A60]">
+          Tell buyers how {productName || 'this product'} is made and what makes it special.
+        </p>
       </div>
 
-      {/* Materials used for this product */}
-      <div className="form-group">
-        <label>Materials Used *</label>
-        <textarea
-          rows="3"
-          value={data.materials || ''}
-          onChange={(e) => onChange('materials', e.target.value)}
-          placeholder="Mention the natural or traditional materials used."
-        />
-      </div>
+      <Field
+        {...story('technique')}
+        as="textarea"
+        rows={3}
+        label="How is it made?"
+        required
+        error={errors.technique}
+        placeholder="Describe the traditional technique or process used."
+      />
 
-      {/* Cultural background of the craft */}
-      <div className="form-group">
-        <label>Cultural Significance</label>
-        <textarea
-          rows="3"
-          value={data.culturalSignificance || ''}
-          onChange={(e) => onChange('culturalSignificance', e.target.value)}
-          placeholder="Share the cultural or coastal significance of this craft."
-        />
-      </div>
+      <Field
+        {...story('materials')}
+        as="textarea"
+        rows={3}
+        label="Materials Used"
+        required
+        error={errors.materials}
+        placeholder="Mention the natural or traditional materials used."
+      />
 
-      {/* Approximate time needed to make the product */}
-      <div className="form-group">
-        <label>Making Time</label>
-        <input
-          type="text"
-          value={data.makingTime || ''}
-          onChange={(e) => onChange('makingTime', e.target.value)}
-          placeholder="e.g. 2 days"
-        />
-      </div>
+      <Field
+        {...story('culturalSignificance')}
+        as="textarea"
+        rows={3}
+        label="Cultural Significance"
+        placeholder="Share the cultural or coastal significance of this craft."
+      />
 
-      {/* Main story shown with the product */}
-      <div className="form-group">
-        <label>The Story Behind This Craft *</label>
-        <textarea
-          rows="4"
-          value={data.storyBehindCraft || ''}
-          onChange={(e) => onChange('storyBehindCraft', e.target.value)}
+      <Field {...story('makingTime')} label="Making Time" placeholder="e.g. 2 days" />
+
+      <div className="space-y-1.5">
+        <Field
+          {...story('storyBehindCraft')}
+          as="textarea"
+          rows={4}
+          label="The Story Behind This Craft"
+          required
+          error={errors.storyBehindCraft}
           placeholder="Tell the story behind this particular piece."
         />
-
-        <small>{(data.storyBehindCraft || '').length} characters</small>
+        <p className="text-[11px] text-[#756A60] text-right">
+          {(data.storyBehindCraft || '').length} characters
+        </p>
       </div>
     </div>
   );
@@ -115,7 +110,7 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
   const [form, setForm] = useState({
     name: p?.name || '',
     image: p?.image || '',
-    category: p?.category || 'Handwoven Crafts',
+    category: p?.category || craftCategories[0],
     price: p?.price ?? '',
     stock: p?.stock ?? 10,
     description: p?.description || '',
@@ -188,8 +183,17 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
     createdAt: p?.createdAt || today(),
   };
 
+  // preview only makes sense once there is something to show
+  const canPreview = form.name.trim() || form.image.trim();
+
   const previewBtn = (
-    <button type="button" onClick={() => setPreviewOpen(true)} className="btn-secondary text-xs">
+    <button
+      type="button"
+      onClick={() => setPreviewOpen(true)}
+      disabled={!canPreview}
+      title={canPreview ? 'Preview this piece' : 'Add a name or photo to preview'}
+      className="btn-secondary text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+    >
       <Eye className="w-4 h-4" /> Preview Piece
     </button>
   );
@@ -274,7 +278,7 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
           label="Product Name / Title"
           required
           error={errors.name}
-          placeholder="e.g. Handwoven Coconut Palm Harvest Basket"
+          placeholder="e.g. Kasuti Embroidered Table Runner"
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -286,17 +290,17 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
             ))}
           </Field>
 
+          {/* price: no currency label, icon or $ prefix */}
           <Field
             {...bind('price')}
             type="number"
             min="1"
-            step="0.5"
-            label="Price (USD)"
-            icon={DollarSign}
-            prefix="$"
+            step="1"
+            label="Price"
+            icon={Tag}
             required
             error={errors.price}
-            placeholder="45.00"
+            placeholder="450"
           />
 
           <Field {...bind('stock')} type="number" min="0" label="Batch Quantity" icon={Package} placeholder="5" />
@@ -351,7 +355,7 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
       </div>
 
       {/* story for this specific product */}
-      <CraftStory data={form.craftStory} onChange={setStory} productName={form.name} />
+      <CraftStory data={form.craftStory} onChange={setStory} productName={form.name} errors={errors} />
 
       {/* bottom actions, handy after scrolling a long form */}
       <div className="card p-6 bg-[#FFF9F0] border border-[#D8C7B2] flex flex-wrap items-center justify-between gap-4">

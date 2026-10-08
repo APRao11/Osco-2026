@@ -257,8 +257,9 @@ export function ManageProducts({
                         </span>
                       </td>
 
+                      {/* price (no currency symbol) */}
                       <td className="py-3.5 px-4 font-serif font-bold text-[#6B4632] text-sm whitespace-nowrap">
-                        ${Number(product.price).toFixed(2)}
+                        {Number(product.price).toFixed(2)}
                       </td>
 
                       <td className="py-3.5 px-4 text-[#756A60] max-w-xs">
