@@ -10,6 +10,8 @@ import { initialArtisanProfile, initialProducts } from './data/mockData.jsx';
 import HomePage from './pages/HomePage';
 import CraftCategoryPage from './pages/CraftCategoryPage';
 import ProductRoutePlaceholder from './pages/ProductRoutePlaceholder';
+import OrderCheckoutPage from './pages/OrderCheckoutPage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import { ArtisanLogin } from './pages/ArtisanLogin.jsx';
 import { ArtisanDashboard } from './pages/ArtisanDashboard.jsx';
 import { ArtisanProfile } from './pages/ArtisanProfile.jsx';
@@ -147,7 +149,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/crafts/:craftSlug" element={<CraftCategoryPage />} />
+        <Route path="/products/:productId/order" element={<OrderCheckoutPage />} />
         <Route path="/products/:productId" element={<ProductRoutePlaceholder />} />
+        <Route path="/orders/:orderId/confirmation" element={<OrderConfirmationPage />} />
         <Route path="/artisan/*" element={<ArtisanWorkspace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -49,8 +49,11 @@ export default function ProductRoutePlaceholder() {
             <img src={product.image} alt={product.name} />
             <p>{product.description || 'A handmade piece from coastal Karnataka.'}</p>
             <p>Artisan: {product.artisan_name || 'Not specified'}</p>
-            <p>Price: ₹{product.price.toLocaleString('en-IN')}</p>
+            <p>Price: ₹{Number(product.price).toLocaleString('en-IN')}</p>
             <p>In stock: {product.stock}</p>
+            <Link className="primary-button product-order-button" to={`/products/${product.id}/order`}>
+              Place an order
+            </Link>
           </>
         ) : null}
         <Link className="primary-button" to="/">
