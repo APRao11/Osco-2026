@@ -127,56 +127,91 @@ const products = [
   },
 ];
 
-const seed = db.transaction(() => {
-  const craftIds = new Map();
-  const findCraft = db.prepare("SELECT id FROM crafts WHERE name = ?");
-  const addCraft = db.prepare(
-    "INSERT INTO crafts (name, description, image, category, location) VALUES (?, ?, ?, ?, ?)"
-  );
+const seedDatabase = () => {
+  const seed = db.transaction(() => {
+    const artisanIds = new Map();
+    const findArtisan = db.prepare("SELECT id FROM artisans WHERE username = ?");
+    const addArtisan = db.prepare(
+      "INSERT OR IGNORE INTO artisans (name, username, password, location, bio) VALUES (?, ?, ?, ?, ?)",
+    );
 
-  for (const craft of crafts) {
-    let savedCraft = findCraft.get(craft.name);
-
-    if (!savedCraft) {
-      addCraft.run(craft.name, craft.description, craft.image, craft.id, null);
-      savedCraft = findCraft.get(craft.name);
+    for (const name of new Set(products.map((product) => product.artisanName))) {
+      const username = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      addArtisan.run(name, username, "osco-demo", "Coastal Karnataka", "Demo artisan account for the OSCO marketplace.");
+      artisanIds.set(name, findArtisan.get(username).id);
     }
 
-    craftIds.set(craft.id, savedCraft.id);
+    const craftIds = new Map();
+    const findCraft = db.prepare("SELECT id FROM crafts WHERE name = ?");
+    const addCraft = db.prepare(
+      "INSERT INTO crafts (name, description, image, category, location) VALUES (?, ?, ?, ?, ?)"
+    );
+
+    for (const craft of crafts) {
+      let savedCraft = findCraft.get(craft.name);
+
+      if (!savedCraft) {
+        addCraft.run(craft.name, craft.description, craft.image, craft.id, null);
+        savedCraft = findCraft.get(craft.name);
+      }
+
+      craftIds.set(craft.id, savedCraft.id);
+    }
+
+    const findProduct = db.prepare(
+      "SELECT id FROM products WHERE name = ? AND craft_id = ?"
+    );
+    const addProduct = db.prepare(
+      "INSERT INTO products (craft_id, artisan_id, name, price, image, artisan_name, stock, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    );
+    const linkExistingProduct = db.prepare(
+      "UPDATE products SET artisan_id = COALESCE(artisan_id, ?), status = COALESCE(status, 'published') WHERE id = ?",
+    );
+
+    for (const product of products) {
+      const craftId = craftIds.get(product.craftId);
+
+      if (craftId === undefined) {
+        throw new Error(`No craft found for product: ${product.name}`);
+      }
+
+      const artisanId = artisanIds.get(product.artisanName);
+      const existingProduct = findProduct.get(product.name, craftId);
+
+      if (!existingProduct) {
+        addProduct.run(
+          craftId,
+          artisanId,
+          product.name,
+          product.price,
+          product.image,
+          product.artisanName,
+          10,
+          "published",
+        );
+      } else {
+        linkExistingProduct.run(artisanId, existingProduct.id);
+      }
+    }
+  });
+
+  try {
+    seed();
+    console.log("Craft, product, and demo artisan data ready.");
+    console.log("Demo artisan login: username=meenakshi-nayak password=osco-demo");
+    console.log("Demo artisan login: username=rukmini-shetty password=osco-demo");
+  } catch (error) {
+    console.error("Failed to seed database:", error.message);
+    throw error;
   }
+};
 
-  const findProduct = db.prepare(
-    "SELECT id FROM products WHERE name = ? AND craft_id = ?"
-  );
-  const addProduct = db.prepare(
-    "INSERT INTO products (craft_id, name, price, image, artisan_name) VALUES (?, ?, ?, ?, ?)"
-  );
+module.exports = seedDatabase;
 
-  for (const product of products) {
-    const craftId = craftIds.get(product.craftId);
-
-    if (craftId === undefined) {
-      throw new Error(`No craft found for product: ${product.name}`);
-    }
-
-    if (!findProduct.get(product.name, craftId)) {
-      addProduct.run(
-        craftId,
-        product.name,
-        product.price,
-        product.image,
-        product.artisanName
-      );
-    }
+if (require.main === module) {
+  try {
+    seedDatabase();
+  } finally {
+    db.close();
   }
-});
-
-try {
-  seed();
-  console.log("Craft and product data seeded.");
-} catch (error) {
-  console.error("Failed to seed database:", error.message);
-  process.exitCode = 1;
-} finally {
-  db.close();
 }

@@ -10,6 +10,36 @@ function readOrders() {
   }
 }
 
+function saveOrder(order) {
+  const orders = readOrders().filter((savedOrder) => String(savedOrder.id) !== String(order.id));
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...orders, order]));
+  return order;
+}
+
+export function normalizeServerOrder(order) {
+  return {
+    id: String(order.id),
+    productId: order.product_id,
+    productName: order.product_name,
+    productImage: order.product_image,
+    craftName: order.craft_name ?? '',
+    artisanName: order.artisan_name ?? 'Local artisan',
+    unitPrice: Number(order.unit_price),
+    quantity: Number(order.quantity),
+    buyerName: order.buyer_name,
+    buyerEmail: order.buyer_email ?? '',
+    phone: order.buyer_phone,
+    address: order.buyer_address,
+    total: Number(order.total_price),
+    status: order.status,
+    createdAt: order.created_at ?? new Date().toISOString(),
+  };
+}
+
+export function saveServerOrder(order) {
+  return saveOrder(normalizeServerOrder(order));
+}
+
 export function createLocalOrder({ product, buyerName, phone, address, quantity }) {
   const orders = readOrders();
   const order = {
@@ -29,8 +59,7 @@ export function createLocalOrder({ product, buyerName, phone, address, quantity 
     createdAt: new Date().toISOString(),
   };
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...orders, order]));
-  return order;
+  return saveOrder(order);
 }
 
 export function getLocalOrder(orderId) {

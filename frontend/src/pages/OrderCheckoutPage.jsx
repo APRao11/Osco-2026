@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { createLocalOrder } from '../data/orderStorage';
+import { createLocalOrder, saveServerOrder } from '../data/orderStorage';
 
 export default function OrderCheckoutPage() {
   const { productId } = useParams();
@@ -41,17 +41,55 @@ export default function OrderCheckoutPage() {
     setForm((current) => ({ ...current, [field]: event.target.value }));
   };
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     if (!product) return;
     setError('');
     setSubmitting(true);
+
+    let response;
     try {
-      const order = createLocalOrder({ ...form, quantity, product });
-      navigate(`/orders/${order.id}/confirmation`);
+      response = await fetch('http://localhost:3000/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: product.id,
+          buyer_name: form.buyerName,
+          buyer_phone: form.phone,
+          buyer_address: form.address,
+          quantity,
+        }),
+      });
     } catch {
-      setError('Could not save this demo order in this browser. Please try again.');
+      try {
+        const localOrder = createLocalOrder({ ...form, quantity, product });
+        navigate(`/orders/${localOrder.id}/confirmation`, { state: { order: localOrder } });
+      } catch {
+        setError('The backend is unavailable and this browser could not save the demo order.');
+        setSubmitting(false);
+      }
+      return;
+    }
+
+    let result = {};
+    try {
+      result = await response.json();
+    } catch {
+      result = {};
+    }
+
+    if (!response.ok) {
+      setError(result.error || 'Could not place this order. Please try again.');
       setSubmitting(false);
+      return;
+    }
+
+    try {
+      const savedOrder = saveServerOrder(result.order);
+      navigate(`/orders/${savedOrder.id}/confirmation`, { state: { order: savedOrder } });
+    } catch {
+      const serverOrder = result.order;
+      navigate(`/orders/${serverOrder.id}/confirmation`, { state: { serverOrder } });
     }
   }
 

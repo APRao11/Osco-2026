@@ -1,9 +1,56 @@
-import { Link, useParams } from 'react-router-dom';
-import { getLocalOrder } from '../data/orderStorage';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { getLocalOrder, normalizeServerOrder } from '../data/orderStorage';
 
 export default function OrderConfirmationPage() {
   const { orderId } = useParams();
-  const order = getLocalOrder(orderId);
+  const location = useLocation();
+  const [order, setOrder] = useState(() => {
+    if (location.state?.order) return location.state.order;
+    if (location.state?.serverOrder) return normalizeServerOrder(location.state.serverOrder);
+    return getLocalOrder(orderId);
+  });
+  const [loading, setLoading] = useState(!order);
+
+  useEffect(() => {
+    let ignore = false;
+    const suppliedOrder = location.state?.order ??
+      (location.state?.serverOrder ? normalizeServerOrder(location.state.serverOrder) : null) ??
+      getLocalOrder(orderId);
+
+    if (suppliedOrder) {
+      setOrder(suppliedOrder);
+      setLoading(false);
+      return () => {
+        ignore = true;
+      };
+    }
+
+    setOrder(null);
+    setLoading(true);
+
+    fetch(`http://localhost:3000/api/orders/${orderId}`)
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Receipt not found.');
+        return result;
+      })
+      .then((result) => {
+        if (!ignore) setOrder(normalizeServerOrder(result.order ?? result));
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [location.key, location.state, orderId]);
+
+  if (loading) {
+    return <main className="container section-block order-page"><div className="empty-state">Loading receipt...</div></main>;
+  }
 
   if (!order) {
     return (
