@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { craftCategories } from '../data/mockData.jsx';
 import { ArtisanProductCard } from '../components/ArtisanProductCard.jsx';
 import { ProductDetailModal } from '../components/ProductDetailModal.jsx';
 import {
@@ -23,7 +22,11 @@ const VIEW_MODES = [
 
 export function ManageProducts({
   products,
+  crafts = [],
   artisan,
+  loading = false,
+  notice = '',
+  onNoticeDismiss,
   onAddProduct,
   onEditProduct,
   onDeleteProduct,
@@ -35,6 +38,8 @@ export function ManageProducts({
 
   const [viewingProduct, setViewingProduct] = useState(null);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.toLowerCase();
@@ -47,7 +52,7 @@ export function ManageProducts({
         (prod.craftStory?.materials || '').toLowerCase().includes(query);
 
       const matchesCategory =
-        selectedCategory === 'All' || prod.category === selectedCategory;
+        selectedCategory === 'All' || String(prod.craft_id) === selectedCategory;
 
       const matchesStatus =
         selectedStatus === 'All' || prod.status === selectedStatus;
@@ -65,15 +70,28 @@ export function ManageProducts({
     setSelectedStatus('All');
   };
 
-  const confirmDelete = () => {
-    if (productToDelete) {
-      onDeleteProduct(productToDelete.id);
+  const confirmDelete = async () => {
+    if (!productToDelete || isDeleting) return;
+    setDeleteError('');
+    setIsDeleting(true);
+    try {
+      await onDeleteProduct(productToDelete.id);
       setProductToDelete(null);
+    } catch (error) {
+      setDeleteError(error.message || 'Could not delete this product.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   return (
     <div className="artisan-manage-products">
+      {notice && (
+        <div className="artisan-success-banner" role="status">
+          <span>{notice}</span>
+          {onNoticeDismiss && <button type="button" onClick={onNoticeDismiss} className="artisan-text-link">Dismiss</button>}
+        </div>
+      )}
       {/* Header */}
       <div className="artisan-manage-heading">
         <div>
@@ -103,7 +121,7 @@ export function ManageProducts({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by craft name, materials, or technique..."
+              placeholder="Search by product name or craft category..."
               className="artisan-search-input"
             />
           </div>
@@ -119,9 +137,9 @@ export function ManageProducts({
                 className={SELECT_CLASS}
               >
                 <option value="All">All Categories</option>
-                {craftCategories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
+                {crafts.map((craft) => (
+                  <option key={craft.id} value={craft.id}>
+                    {craft.name}
                   </option>
                 ))}
               </select>
@@ -175,7 +193,9 @@ export function ManageProducts({
       </div>
 
       {/* Main Listing View */}
-      {filteredProducts.length === 0 ? (
+      {loading ? (
+        <p className="artisan-muted" role="status">Loading your products...</p>
+      ) : filteredProducts.length === 0 ? (
         <div className="card artisan-empty-products">
           <Package className="artisan-empty-icon" />
           <div className="artisan-empty-copy">
@@ -212,7 +232,7 @@ export function ManageProducts({
                   <th>Craft Piece</th>
                   <th>Category</th>
                   <th>Price</th>
-                  <th>Craft Technique & Story</th>
+                  <th>Craft Story (not stored)</th>
                   <th>Status</th>
                   <th className="artisan-table-actions-heading">Actions</th>
                 </tr>
@@ -253,12 +273,12 @@ export function ManageProducts({
                       </td>
 
                       <td className="artisan-table-cell artisan-table-price">
-                        ${Number(product.price).toFixed(2)}
+                        ₹{Number(product.price).toLocaleString('en-IN')}
                       </td>
 
                       <td className="artisan-table-cell artisan-table-story-cell">
                         <p className="artisan-table-technique">
-                          {product.craftStory?.technique || 'Handcrafted'}
+                          {product.craftStory?.technique || 'Craft story is not stored by the current backend.'}
                         </p>
                         <p className="artisan-table-materials">
                           {product.craftStory?.materials || ''}
@@ -278,7 +298,7 @@ export function ManageProducts({
                           <button
                             onClick={() => setViewingProduct(product)}
                             className="artisan-table-icon-button"
-                            title="View Story & Details"
+                            title="View Product Details"
                           >
                             <Eye className="artisan-icon" />
                           </button>
@@ -332,16 +352,19 @@ export function ManageProducts({
                   Delete Craft Product?
                 </h3>
                 <p className="artisan-muted artisan-small-text artisan-confirm-description">
-                  Are you sure you want to remove &ldquo;{productToDelete.name}&rdquo;? Its individual craft story and imagery will be deleted from your catalog.
+                  Are you sure you want to remove &ldquo;{productToDelete.name}&rdquo;? The backend prevents deleting products that already have orders.
                 </p>
               </div>
             </div>
 
+            {deleteError && <p className="artisan-login-error" role="alert">{deleteError}</p>}
+
             <div className="artisan-confirm-actions">
               <button
                 type="button"
-                onClick={() => setProductToDelete(null)}
+                onClick={() => { setDeleteError(''); setProductToDelete(null); }}
                 className="btn-secondary artisan-small-button"
+                disabled={isDeleting}
               >
                 Keep Product
               </button>
@@ -349,8 +372,9 @@ export function ManageProducts({
                 type="button"
                 onClick={confirmDelete}
                 className="artisan-button artisan-button-danger"
+                disabled={isDeleting}
               >
-                Yes, Delete
+                {isDeleting ? 'Deleting...' : 'Yes, Delete'}
               </button>
             </div>
           </div>

@@ -17,6 +17,7 @@ export function ProductDetailModal({ product, artisan, isOpen, onClose, onEdit }
   if (!isOpen || !product) return null;
 
   const story = product.craftStory || {};
+  const hasSavedStory = Object.values(story).some(Boolean);
   const isPublished = product.status === 'published';
 
   return (
@@ -26,7 +27,7 @@ export function ProductDetailModal({ product, artisan, isOpen, onClose, onEdit }
         <div className="artisan-modal-header">
           <div>
             <span className="artisan-modal-eyebrow">
-              Product & Craft Story View
+              Product Details
             </span>
             <h3 className="artisan-modal-title">{product.name}</h3>
           </div>
@@ -58,7 +59,7 @@ export function ProductDetailModal({ product, artisan, isOpen, onClose, onEdit }
               </div>
 
               <div>
-                <div className="artisan-modal-price">${Number(product.price).toFixed(2)}</div>
+                <div className="artisan-modal-price">₹{Number(product.price).toLocaleString('en-IN')}</div>
                 {product.stock !== undefined && (
                   <p className="artisan-muted artisan-small-text">
                     <Package className="artisan-icon" /> Stock: {product.stock} units
@@ -95,25 +96,27 @@ export function ProductDetailModal({ product, artisan, isOpen, onClose, onEdit }
               <h4>Craft Story of This Individual Piece</h4>
             </div>
 
-            <div className="artisan-story-grid">
-              {storyCards.map(({ key, title, icon: Icon, fallback }) => (
-                <div key={key} className="artisan-story-card">
-                  <span className="artisan-story-card-title">
-                    <Icon className="artisan-icon artisan-icon-small" /> {title}
-                  </span>
-                  <p>{story[key] || fallback}</p>
+            {hasSavedStory ? (
+              <>
+                <div className="artisan-story-grid">
+                  {storyCards.map(({ key, title, icon: Icon, fallback }) => (
+                    <div key={key} className="artisan-story-card">
+                      <span className="artisan-story-card-title">
+                        <Icon className="artisan-icon artisan-icon-small" /> {title}
+                      </span>
+                      <p>{story[key] || fallback}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-
-            {/* skip this box entirely if the maker hasn't written a story */}
-            {story.storyBehindCraft && (
-              <div className="artisan-story-card artisan-story-full">
-                <span className="artisan-story-card-title">
-                  The Story Behind The Craft
-                </span>
-                <p className="artisan-story-quote">&ldquo;{story.storyBehindCraft}&rdquo;</p>
-              </div>
+                {story.storyBehindCraft && (
+                  <div className="artisan-story-card artisan-story-full">
+                    <span className="artisan-story-card-title">The Story Behind The Craft</span>
+                    <p className="artisan-story-quote">&ldquo;{story.storyBehindCraft}&rdquo;</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="artisan-muted">The current backend does not store product-specific craft stories.</p>
             )}
           </div>
         </div>

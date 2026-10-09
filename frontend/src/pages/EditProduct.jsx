@@ -4,6 +4,7 @@ import { ProductForm } from '../components/ProductForm.jsx';
 export function EditProduct({
   product,
   artisan,
+  crafts,
   onSaveProduct,
   onCancel,
 }) {
@@ -11,6 +12,7 @@ export function EditProduct({
     <div className="artisan-product-page">
       <ProductForm
         initialProduct={product}
+        crafts={crafts}
         artisan={artisan}
         isEditing={true}
         onSave={onSaveProduct}

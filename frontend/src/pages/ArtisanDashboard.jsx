@@ -270,10 +270,10 @@ export function ArtisanDashboard({
                           {product.name}
                         </h4>
                         <div className="artisan-recent-product-price">
-                          ${Number(product.price).toFixed(2)}
+                          ₹{Number(product.price).toLocaleString('en-IN')}
                         </div>
                         <p className="artisan-recent-product-technique">
-                          Craft Story: {product.craftStory?.technique || 'Handmade'}
+                          Craft Story: {product.craftStory?.technique || 'Not stored by the current backend'}
                         </p>
                       </div>
                     </div>

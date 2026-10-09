@@ -84,7 +84,7 @@ export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
         <div className="artisan-success-banner">
           <span className="artisan-success-message">
             <CheckCircle2 className="artisan-icon artisan-icon-success" />
-            Profile updated successfully!
+            Profile preview updated for this session only; the current backend does not save these profile edits.
           </span>
           <button type="button" onClick={onPreviewMeetTheMaker} className="artisan-text-link artisan-link-strong">
             Preview Meet the Maker →
@@ -103,7 +103,7 @@ export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
             <BookOpen className="artisan-icon" /> Preview
           </button>
           <button type="submit" className="btn-primary artisan-small-button">
-            <Save className="artisan-icon" /> Save Profile
+            <Save className="artisan-icon" /> Update Preview
           </button>
         </div>
       </div>

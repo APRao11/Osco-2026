@@ -1,40 +1,48 @@
 import React, { useState } from 'react';
 import { Anchor, Sparkles, Key, Mail, ArrowRight } from 'lucide-react';
+import { loginArtisan } from '../data/artisanApi.js';
 
-const DEMO_PASSWORD = 'coastal-crafts';
+const DEMO_USERNAME = 'meenakshi-nayak';
+const DEMO_PASSWORD = 'osco-demo';
 
 const INPUT_CLASS = 'artisan-login-input';
 
 export function ArtisanLogin({
   onLogin,
-  artisanName = 'Meera Nambiar',
-  artisanEmail = 'meera.crafts@coastalheritage.org',
 }) {
-  const [email, setEmail] = useState(artisanEmail);
+  const [username, setUsername] = useState(DEMO_USERNAME);
   const [password, setPassword] = useState(DEMO_PASSWORD);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const authenticate = async (loginUsername, loginPassword) => {
     setError('');
 
-    if (!email.trim() || !password.trim()) {
-      setError('Please provide your artisan email and password.');
+    if (!loginUsername.trim() || !loginPassword.trim()) {
+      setError('Please provide your artisan username and password.');
       return;
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const artisan = await loginArtisan(loginUsername.trim(), loginPassword);
+      onLogin(artisan);
+    } catch (loginError) {
+      setError(loginError.message || 'Could not log in. Please try again.');
+    } finally {
       setIsLoading(false);
-      onLogin();
-    }, 300);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    authenticate(username, password);
   };
 
   const handleQuickDemo = () => {
-    setEmail(artisanEmail);
+    setUsername(DEMO_USERNAME);
     setPassword(DEMO_PASSWORD);
-    onLogin();
+    authenticate(DEMO_USERNAME, DEMO_PASSWORD);
   };
 
   return (
@@ -67,22 +75,24 @@ export function ArtisanLogin({
 
             <div className="artisan-login-field">
               <label
-                htmlFor="artisan-email"
+                htmlFor="artisan-username"
                 className="artisan-field-label"
               >
-                Artisan Email / Username
+                Artisan Username
               </label>
               <div className="artisan-login-input-wrap">
                 <span className="artisan-login-input-icon">
                   <Mail className="artisan-icon" />
                 </span>
                 <input
-                  id="artisan-email"
+                  id="artisan-username"
                   type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="artisan@coastalheritage.org"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="meenakshi-nayak"
                   className={INPUT_CLASS}
+                  autoComplete="username"
+                  required
                 />
               </div>
             </div>
@@ -105,6 +115,8 @@ export function ArtisanLogin({
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   className={INPUT_CLASS}
+                  autoComplete="current-password"
+                  required
                 />
               </div>
             </div>
@@ -130,15 +142,16 @@ export function ArtisanLogin({
           {/* Quick Demo Access */}
           <div className="artisan-login-demo">
             <p className="artisan-muted artisan-tiny-text">
-              Quick evaluation access:
+              Demo login: <strong>meenakshi-nayak</strong> / <strong>osco-demo</strong> or <strong>rukmini-shetty</strong> / <strong>osco-demo</strong>.
             </p>
             <button
               type="button"
               onClick={handleQuickDemo}
               className="artisan-button artisan-button-draft artisan-login-demo-button"
+              disabled={isLoading}
             >
               <Sparkles className="artisan-icon artisan-icon-accent" />
-              <span>Log in as {artisanName}</span>
+              <span>Log in as Meenakshi Nayak</span>
             </button>
           </div>
         </div>

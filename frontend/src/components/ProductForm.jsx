@@ -1,13 +1,9 @@
-import React from 'react';
-import { useState } from 'react';
-import { Save, Eye, AlertCircle, DollarSign, Package, Layers, ArrowLeft, CheckCircle } from 'lucide-react';
-import { craftCategories } from '../data/mockData.jsx';
+import React, { useEffect, useState } from 'react';
+import { Save, Eye, AlertCircle, IndianRupee, Package, Layers, ArrowLeft } from 'lucide-react';
 import { ImageUpload } from './ImageUpload.jsx';
 import { ProductDetailModal } from './ProductDetailModal.jsx';
 
-// shared input look, so we don't repeat this long class string everywhere
 const inputStyle = 'artisan-field-input';
-
 const today = () => new Date().toISOString().split('T')[0];
 
 const emptyStory = {
@@ -18,7 +14,6 @@ const emptyStory = {
   makingTime: '',
 };
 
-// label + input/textarea/select + error message in one reusable piece
 function Field({ label, icon: Icon, required, error, prefix, as: Tag = 'input', children, ...props }) {
   return (
     <div className="artisan-product-field">
@@ -40,235 +35,216 @@ function Field({ label, icon: Icon, required, error, prefix, as: Tag = 'input', 
   );
 }
 
-// story section (previously CraftStory.jsx), only used by ProductForm
 function CraftStory({ data, onChange, productName }) {
   return (
     <div className="card craft-story">
       <h3>Craft Story</h3>
-
       <p className="story-intro">
-        Tell buyers how {productName || 'this product'} is made and what makes it special.
+        Preview story details for {productName || 'this product'}. The current backend does not save product craft stories.
+      </p>
+      <p className="artisan-muted artisan-tiny-text" role="note">
+        These fields are preview-only and will not be stored in SQLite.
       </p>
 
-      {/* How the product is made */}
       <div className="form-group">
-        <label>How is it made? *</label>
+        <label>How is it made?</label>
         <textarea
           rows="3"
           value={data.technique || ''}
-          onChange={(e) => onChange('technique', e.target.value)}
+          onChange={(event) => onChange('technique', event.target.value)}
           placeholder="Describe the traditional technique or process used."
         />
       </div>
-
-      {/* Materials used for this product */}
       <div className="form-group">
-        <label>Materials Used *</label>
+        <label>Materials Used</label>
         <textarea
           rows="3"
           value={data.materials || ''}
-          onChange={(e) => onChange('materials', e.target.value)}
+          onChange={(event) => onChange('materials', event.target.value)}
           placeholder="Mention the natural or traditional materials used."
         />
       </div>
-
-      {/* Cultural background of the craft */}
       <div className="form-group">
         <label>Cultural Significance</label>
         <textarea
           rows="3"
           value={data.culturalSignificance || ''}
-          onChange={(e) => onChange('culturalSignificance', e.target.value)}
+          onChange={(event) => onChange('culturalSignificance', event.target.value)}
           placeholder="Share the cultural or coastal significance of this craft."
         />
       </div>
-
-      {/* Approximate time needed to make the product */}
       <div className="form-group">
         <label>Making Time</label>
         <input
           type="text"
           value={data.makingTime || ''}
-          onChange={(e) => onChange('makingTime', e.target.value)}
+          onChange={(event) => onChange('makingTime', event.target.value)}
           placeholder="e.g. 2 days"
         />
       </div>
-
-      {/* Main story shown with the product */}
       <div className="form-group">
-        <label>The Story Behind This Craft *</label>
+        <label>The Story Behind This Craft</label>
         <textarea
           rows="4"
           value={data.storyBehindCraft || ''}
-          onChange={(e) => onChange('storyBehindCraft', e.target.value)}
+          onChange={(event) => onChange('storyBehindCraft', event.target.value)}
           placeholder="Tell the story behind this particular piece."
         />
-
         <small>{(data.storyBehindCraft || '').length} characters</small>
       </div>
     </div>
   );
 }
 
-export function ProductForm({ initialProduct: p, artisan, isEditing = false, onSave, onCancel }) {
-  // one state object instead of eight separate useState calls
+export function ProductForm({ initialProduct: productRecord, crafts = [], artisan, isEditing = false, onSave, onCancel }) {
   const [form, setForm] = useState({
-    name: p?.name || '',
-    image: p?.image || '',
-    category: p?.category || 'Handwoven Crafts',
-    price: p?.price ?? '',
-    stock: p?.stock ?? 10,
-    description: p?.description || '',
-    status: p?.status || 'published',
-    craftStory: p?.craftStory || emptyStory,
+    name: productRecord?.name || '',
+    image: productRecord?.image || '',
+    craft_id: productRecord?.craft_id ?? crafts[0]?.id ?? '',
+    price: productRecord?.price ?? '',
+    stock: productRecord?.stock ?? 10,
+    description: productRecord?.description || '',
+    status: productRecord?.status || 'published',
+    craftStory: productRecord?.craftStory || emptyStory,
   });
   const [errors, setErrors] = useState({});
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [toast, setToast] = useState(null); // holds the saved status while the toast shows
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
-  const set = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
-  const setStory = (field, value) => set('craftStory', { ...form.craftStory, [field]: value });
+  useEffect(() => {
+    if (!form.craft_id && crafts.length > 0) {
+      setForm((current) => ({ ...current, craft_id: crafts[0].id }));
+    }
+  }, [crafts, form.craft_id]);
 
-  // shortcut for plain inputs: value + onChange
-  const bind = (field) => ({ value: form[field], onChange: (e) => set(field, e.target.value) });
+  const set = (field, value) => setForm((previous) => ({ ...previous, [field]: value }));
+  const setStory = (field, value) => setForm((previous) => ({
+    ...previous,
+    craftStory: { ...previous.craftStory, [field]: value },
+  }));
+  const bind = (field) => ({ value: form[field], onChange: (event) => set(field, event.target.value) });
 
   const validate = () => {
-    const s = form.craftStory;
     const checks = [
       ['name', !form.name.trim(), 'Please provide a product title.'],
       ['image', !form.image.trim(), 'A product photograph is required to showcase your craft.'],
       ['price', !form.price || Number(form.price) <= 0, 'Please enter a valid price.'],
       ['description', !form.description.trim(), 'Please provide a short product description.'],
-      ['technique', !s.technique?.trim(), 'Please explain the traditional technique used.'],
-      ['materials', !s.materials?.trim(), 'Please list the natural coastal materials.'],
-      ['storyBehindCraft', !s.storyBehindCraft?.trim(), 'Please share the story behind this craft piece.'],
+      ['craft_id', !form.craft_id, 'Please select a craft category.'],
     ];
-
-    // keep only the checks that failed
-    const found = Object.fromEntries(checks.filter(([, failed]) => failed).map(([key, , msg]) => [key, msg]));
+    const found = Object.fromEntries(checks.filter(([, failed]) => failed).map(([key, , message]) => [key, message]));
     setErrors(found);
     return Object.keys(found).length === 0;
   };
 
-  const handleSubmit = (targetStatus) => {
+  const handleSubmit = async (targetStatus) => {
+    if (isSaving) return;
     if (!validate()) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
-    const status = targetStatus || form.status;
-    const product = {
-      ...form,
-      id: p?.id || `prod-${Date.now()}`,
+    const payload = {
+      ...(productRecord?.id ? { id: productRecord.id } : {}),
+      craft_id: Number(form.craft_id),
+      artisan_id: Number(artisan.id),
       name: form.name.trim(),
-      price: Number(form.price),
-      stock: Number(form.stock) || 0,
       description: form.description.trim(),
-      status,
-      createdAt: p?.createdAt || today(),
+      price: Number(form.price),
+      image: form.image || null,
+      stock: Number(form.stock) || 0,
+      status: targetStatus || form.status,
     };
 
-    // show the toast for a moment before handing the product back
-    setToast(status);
-    setTimeout(() => onSave(product), 800);
+    setSaveError('');
+    setIsSaving(true);
+    try {
+      await onSave(payload);
+    } catch (error) {
+      setSaveError(error.message || 'Could not save this product.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  // what the preview modal shows, with fallbacks for empty fields
   const previewProduct = {
     ...form,
-    id: p?.id || 'preview',
+    id: productRecord?.id || 'preview',
+    category: crafts.find((craft) => String(craft.id) === String(form.craft_id))?.name || '',
     name: form.name || 'Untitled Craft Item',
-    image:
-      form.image ||
-      'https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&w=800&q=80',
+    image: form.image || 'https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&w=800&q=80',
     price: Number(form.price) || 0,
     stock: Number(form.stock) || 0,
-    description:
-      form.description || 'Handmade with natural coastal fibers and traditional techniques passed down through generations.',
-    createdAt: p?.createdAt || today(),
+    description: form.description || 'Handmade with natural coastal fibers and traditional techniques passed down through generations.',
+    createdAt: productRecord?.created_at || today(),
   };
 
-  const previewBtn = (
+  const previewButton = (
     <button type="button" onClick={() => setPreviewOpen(true)} className="btn-secondary artisan-small-button">
       <Eye className="artisan-icon" /> Preview Piece
     </button>
   );
-  const publishBtn = (
-    <button type="button" onClick={() => handleSubmit('published')} className="btn-primary artisan-small-button">
-      <Save className="artisan-icon" /> {isEditing ? 'Save Changes' : 'Publish Product'}
+  const saveButton = (
+    <button
+      type="button"
+      onClick={() => handleSubmit(form.status)}
+      className="btn-primary artisan-small-button"
+      disabled={isSaving || crafts.length === 0}
+    >
+      <Save className="artisan-icon" /> {isSaving ? 'Saving...' : isEditing ? 'Save Changes' : 'Publish Product'}
     </button>
   );
 
   return (
     <div className="artisan-product-form">
-      {toast && (
-        <div className="artisan-save-toast">
-          <CheckCircle className="artisan-icon artisan-icon-success" />
-          <div>
-            <p className="artisan-small-strong">{isEditing ? 'Product Updated Successfully' : 'Product Saved Successfully'}</p>
-            <p className="artisan-toast-caption">
-              {toast === 'published' ? 'Now available in your catalog' : 'Saved as draft'}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* header: back button, title and the main actions */}
       <div className="artisan-product-form-heading">
         <div className="artisan-product-title-group">
-          <button
-            type="button"
-            onClick={onCancel}
-            title="Return to products"
-            className="artisan-back-button"
-          >
+          <button type="button" onClick={onCancel} title="Return to products" className="artisan-back-button">
             <ArrowLeft className="artisan-icon artisan-icon-large" />
           </button>
           <div>
             <h2 className="artisan-heading-secondary">
-              {isEditing ? `Edit: ${p?.name || 'Craft Product'}` : 'Add New Coastal Craft Product'}
+              {isEditing ? `Edit: ${productRecord?.name || 'Craft Product'}` : 'Add New Coastal Craft Product'}
             </h2>
             <p className="artisan-muted artisan-small-text">
-              {isEditing ? 'Update product details and the craft story.' : 'Document and publish a handmade coastal craft item.'}
+              {isEditing ? 'Update product details and publishing state.' : 'Add a handmade coastal craft item to your catalogue.'}
             </p>
           </div>
         </div>
-
         <div className="artisan-form-heading-actions">
-          {previewBtn}
+          {previewButton}
           <button
             type="button"
             onClick={() => handleSubmit('draft')}
             className="artisan-button artisan-button-draft"
+            disabled={isSaving || crafts.length === 0}
           >
-            Save as Draft
+            {isSaving ? 'Saving...' : 'Save as Draft'}
           </button>
-          {publishBtn}
+          {saveButton}
         </div>
       </div>
 
-      {/* list of everything that failed validation */}
+      {crafts.length === 0 && <p className="artisan-muted" role="status">Loading craft categories or no categories are available.</p>}
       {Object.keys(errors).length > 0 && (
-        <div className="artisan-validation-banner">
+        <div className="artisan-validation-banner" role="alert">
           <AlertCircle className="artisan-icon artisan-validation-icon" />
           <div className="artisan-validation-copy">
-            <p className="artisan-small-strong">Please complete the required details before publishing:</p>
+            <p className="artisan-small-strong">Please complete the required product details:</p>
             <ul className="artisan-validation-list">
-              {Object.values(errors).map((msg) => (
-                <li key={msg}>{msg}</li>
-              ))}
+              {Object.values(errors).map((message) => <li key={message}>{message}</li>)}
             </ul>
           </div>
         </div>
       )}
+      {saveError && <p className="artisan-login-error" role="alert">{saveError}</p>}
 
-      {/* general product info */}
       <div className="card artisan-product-section">
         <div className="artisan-section-heading">
           <h3 className="artisan-section-heading-title">General Product Information</h3>
-          <p className="artisan-muted artisan-small-text">Details shown to buyers browsing the catalog.</p>
+          <p className="artisan-muted artisan-small-text">Details stored by the current product API.</p>
         </div>
-
         <Field
           {...bind('name')}
           label="Product Name / Title"
@@ -278,27 +254,22 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
         />
 
         <div className="artisan-product-details-grid">
-          <Field {...bind('category')} as="select" label="Craft Category" icon={Layers} required>
-            {craftCategories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
+          <Field {...bind('craft_id')} as="select" label="Craft Category" icon={Layers} required disabled={crafts.length === 0}>
+            <option value="">Select a category</option>
+            {crafts.map((craft) => <option key={craft.id} value={craft.id}>{craft.name}</option>)}
           </Field>
-
           <Field
             {...bind('price')}
             type="number"
             min="1"
             step="0.5"
-            label="Price (USD)"
-            icon={DollarSign}
-            prefix="$"
+            label="Price (INR)"
+            icon={IndianRupee}
+            prefix="₹"
             required
             error={errors.price}
-            placeholder="45.00"
+            placeholder="2450"
           />
-
           <Field {...bind('stock')} type="number" min="0" label="Batch Quantity" icon={Package} placeholder="5" />
         </div>
 
@@ -316,19 +287,21 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
           <ImageUpload
             currentImage={form.image}
             label="Product Craft Photograph"
-            onImageChange={(img) => {
-              set('image', img);
-              setErrors((prev) => ({ ...prev, image: '' })); // clear the error once a photo is added
+            onImageChange={(image) => {
+              set('image', image);
+              setErrors((previous) => ({ ...previous, image: '' }));
             }}
           />
           {errors.image && <p className="artisan-field-error artisan-image-error">{errors.image}</p>}
+          <p className="artisan-muted artisan-tiny-text" role="note">
+            Product images are sent in the existing image field. Large data URLs may exceed the backend JSON request limit.
+          </p>
         </div>
 
-        {/* draft / published switch */}
         <div className="artisan-publish-settings">
           <div>
             <p className="artisan-field-label">Publishing State</p>
-            <p className="artisan-muted artisan-tiny-text">Publish immediately or keep it as a draft.</p>
+            <p className="artisan-muted artisan-tiny-text">The backend supports published and draft statuses.</p>
           </div>
           <div className="artisan-publish-options">
             {[
@@ -340,6 +313,7 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
                 type="button"
                 onClick={() => set('status', value)}
                 className={`artisan-status-option ${activeStyle} ${form.status === value ? 'is-selected' : ''}`}
+                disabled={isSaving}
               >
                 {text}
               </button>
@@ -348,17 +322,13 @@ export function ProductForm({ initialProduct: p, artisan, isEditing = false, onS
         </div>
       </div>
 
-      {/* story for this specific product */}
       <CraftStory data={form.craftStory} onChange={setStory} productName={form.name} />
 
-      {/* bottom actions, handy after scrolling a long form */}
       <div className="card artisan-form-footer">
-        <button type="button" onClick={onCancel} className="btn-secondary artisan-small-button">
-          Cancel
-        </button>
+        <button type="button" onClick={onCancel} className="btn-secondary artisan-small-button" disabled={isSaving}>Cancel</button>
         <div className="artisan-action-row">
-          {previewBtn}
-          {publishBtn}
+          {previewButton}
+          {saveButton}
         </div>
       </div>
 

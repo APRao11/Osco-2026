@@ -23,7 +23,7 @@ export function ArtisanProductCard({ product, onEdit, onDelete, onViewDetails })
           <Layers className="artisan-icon artisan-icon-small" /> {product.category}
         </span>
         <span className="artisan-price-badge">
-          ${Number(product.price).toFixed(2)}
+          ₹{Number(product.price).toLocaleString('en-IN')}
         </span>
       </div>
 
@@ -34,13 +34,13 @@ export function ArtisanProductCard({ product, onEdit, onDelete, onViewDetails })
           <div className="artisan-technique-note">
             <span>Craft Technique:</span>
             <p>
-              {product.craftStory?.technique || 'Traditional handcrafting'}
+              {product.craftStory?.technique || 'Craft stories are not stored by the current backend.'}
             </p>
           </div>
         </div>
         <div className="artisan-product-card-actions">
           <button onClick={() => onViewDetails(product)} className="artisan-view-button">
-            <Eye className="artisan-icon" /> View Story
+            <Eye className="artisan-icon" /> View Details
           </button>
           <button onClick={() => onEdit(product)} title="Edit product" className={iconButtonClass}>
             <Edit2 className="artisan-icon" />
