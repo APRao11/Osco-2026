@@ -294,7 +294,7 @@ export function ProductForm({ initialProduct: productRecord, crafts = [], artisa
           />
           {errors.image && <p className="artisan-field-error artisan-image-error">{errors.image}</p>}
           <p className="artisan-muted artisan-tiny-text" role="note">
-            Product images are sent in the existing image field. Large data URLs may exceed the backend JSON request limit.
+            Images are saved in the existing image field. Choose files under 3.5 MB.
           </p>
         </div>
 

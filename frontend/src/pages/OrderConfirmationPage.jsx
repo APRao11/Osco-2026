@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { getLocalOrder, normalizeServerOrder } from '../data/orderStorage';
+import { API_ROOT } from '../data/artisanApi.js';
 
 export default function OrderConfirmationPage() {
   const { orderId } = useParams();
@@ -29,7 +30,7 @@ export default function OrderConfirmationPage() {
     setOrder(null);
     setLoading(true);
 
-    fetch(`http://localhost:3000/api/orders/${orderId}`)
+    fetch(`${API_ROOT}/orders/${orderId}`)
       .then(async (response) => {
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Receipt not found.');

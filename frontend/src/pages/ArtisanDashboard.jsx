@@ -9,9 +9,11 @@ import {
   FileText,
   Compass,
 } from 'lucide-react';
+import ArtisanOrders from '../components/ArtisanOrders.jsx';
 
 export function ArtisanDashboard({
   artisan,
+  artisanId,
   products,
   onNavigate,
   onEditProduct,
@@ -20,9 +22,8 @@ export function ArtisanDashboard({
   const publishedProducts = products.filter((p) => p.status === 'published');
   const draftProducts = products.filter((p) => p.status === 'draft');
 
-  let profileCompletion = 100;
-  if (!artisan.video) profileCompletion -= 10;
-  if (!artisan.phone) profileCompletion -= 5;
+  const profileCompletion = [artisan.name, artisan.location, artisan.bio, artisan.craftBackground, artisan.makerStory]
+    .filter(Boolean).length * 20;
 
   return (
     <div className="artisan-dashboard">
@@ -52,7 +53,7 @@ export function ArtisanDashboard({
                 Welcome back, {artisan.name}
               </h1>
               <p className="artisan-welcome-description">
-                Speciality: <strong className="artisan-text-strong">{artisan.craftSpeciality}</strong> &bull; {artisan.yearsOfExperience} years of craft mastery.
+                Speciality: <strong className="artisan-text-strong">{artisan.craftSpeciality || 'Coastal crafts'}</strong>
               </p>
             </div>
           </div>
@@ -182,7 +183,7 @@ export function ArtisanDashboard({
                   Craft Lineage:
                 </span>
                 <p className="artisan-summary-lineage">
-                  {artisan.craftBackground}
+                  {artisan.craftBackground || 'Add your craft background to your maker profile.'}
                 </p>
               </div>
             </div>
@@ -227,7 +228,7 @@ export function ArtisanDashboard({
                   No craft pieces added yet
                 </h3>
                 <p className="artisan-muted artisan-small-text artisan-empty-description">
-                  Add your first coastal craft item with its authentic craft story.
+                  Add your first coastal craft item and product details.
                 </p>
               </div>
               <button
@@ -300,6 +301,7 @@ export function ArtisanDashboard({
           )}
         </div>
       </div>
+      <ArtisanOrders artisanId={artisanId} />
     </div>
   );
 }

@@ -21,9 +21,14 @@ import { ManageProducts } from './pages/ManageProducts.jsx';
 import {
   createProduct,
   deleteProduct,
+  getArtisanProfile,
   getArtisanProducts,
   getCrafts,
   normalizeProduct,
+  normalizeArtisan,
+  artisanProfilePayload,
+  productPayload,
+  updateArtisanProfile,
   updateProduct,
 } from './data/artisanApi.js';
 
@@ -41,17 +46,8 @@ function readArtisanSession() {
 function createWorkspaceArtisan(record) {
   return {
     ...initialArtisanProfile,
-    ...record,
-    email: record.username,
-    // The backend stores only these core public fields. Other profile fields
-    // remain display defaults and are not persisted by this integration.
-    craftSpeciality: '',
-    workshopName: '',
-    craftBackground: '',
-    makerStory: '',
-    video: '',
-    phone: '',
-    yearsOfExperience: '',
+    ...normalizeArtisan(record),
+    photo: record.photo || initialArtisanProfile.photo,
   };
 }
 
@@ -111,12 +107,16 @@ function ArtisanWorkspace() {
     setProductsLoading(true);
     setWorkspaceError('');
     try {
-      const [craftRows, productRows] = await Promise.all([
+      const [craftRows, productRows, artisanRecord] = await Promise.all([
         getCrafts(),
         getArtisanProducts(artisanId),
+        getArtisanProfile(artisanId),
       ]);
       setCrafts(craftRows);
       setProducts(productRows.map(normalizeProduct));
+      const savedProfile = createWorkspaceArtisan(artisanRecord);
+      setArtisan(savedProfile);
+      window.sessionStorage.setItem(ARTISAN_SESSION_KEY, JSON.stringify(savedProfile));
       return true;
     } catch (error) {
       setWorkspaceError(error.message || 'Could not load artisan products.');
@@ -153,9 +153,9 @@ function ArtisanWorkspace() {
   const saveProduct = async (product) => {
     const { id, ...payload } = product;
     if (id) {
-      await updateProduct(id, payload);
+      await updateProduct(id, productPayload(payload), artisan.id);
     } else {
-      await createProduct(payload);
+      await createProduct(productPayload(payload));
     }
     const refreshed = await reloadWorkspaceData(artisan.id);
     setMutationNotice(
@@ -165,6 +165,14 @@ function ArtisanWorkspace() {
     );
     setEditingProduct(null);
     navigateTo('manage-products');
+  };
+
+  const saveProfile = async (profile) => {
+    const saved = await updateArtisanProfile(artisan.id, artisanProfilePayload(profile));
+    const workspaceArtisan = createWorkspaceArtisan(saved);
+    setArtisan(workspaceArtisan);
+    window.sessionStorage.setItem(ARTISAN_SESSION_KEY, JSON.stringify(workspaceArtisan));
+    return workspaceArtisan;
   };
 
   const startEditingProduct = (product) => {
@@ -208,9 +216,9 @@ function ArtisanWorkspace() {
           />
           <Route
             path="dashboard"
-            element={<ArtisanDashboard artisan={artisan} products={products} onNavigate={navigateTo} onEditProduct={startEditingProduct} onViewProduct={setViewingProduct} />}
+            element={<ArtisanDashboard artisan={artisan} artisanId={artisan.id} products={products} onNavigate={navigateTo} onEditProduct={startEditingProduct} onViewProduct={setViewingProduct} />}
           />
-          <Route path="profile" element={<ArtisanProfile artisan={artisan} onSaveProfile={setArtisan} />} />
+          <Route path="profile" element={<ArtisanProfile artisan={artisan} onSaveProfile={saveProfile} />} />
           <Route
             path="products/add"
             element={<AddProduct artisan={artisan} crafts={crafts} onSaveProduct={saveProduct} onCancel={() => navigateTo('manage-products')} />}
@@ -222,7 +230,7 @@ function ArtisanWorkspace() {
           <Route
             path="products"
             element={<ManageProducts products={products} crafts={crafts} artisan={artisan} loading={productsLoading} notice={mutationNotice} onNoticeDismiss={() => setMutationNotice('')} onAddProduct={() => navigateTo('add-product')} onEditProduct={startEditingProduct} onDeleteProduct={async (id) => {
-              await deleteProduct(id);
+              await deleteProduct(id, artisan.id);
               const refreshed = await reloadWorkspaceData(artisan.id);
               setMutationNotice(refreshed ? 'Product deleted successfully.' : 'Product deleted from SQLite, but the list could not be refreshed. Retry the load.');
             }} />}

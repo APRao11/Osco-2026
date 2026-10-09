@@ -5,11 +5,8 @@ import {
   MapPin,
   Sparkles,
   Award,
-  Video,
   Save,
   CheckCircle2,
-  Mail,
-  Phone,
   Store,
   BookOpen,
   Calendar,
@@ -63,16 +60,25 @@ function Field({ label, name, value, onChange, icon: Icon, textarea, type = 'tex
 export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
   const [profile, setProfile] = useState({ ...initialProfile });
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const update = (field, value) => setProfile((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(profile);
-
-    // show the success banner briefly, then hide it
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setSaving(true);
+    setSaved(false);
+    setError('');
+    try {
+      const persistedProfile = await onSave(profile);
+      setProfile({ ...profile, ...persistedProfile });
+      setSaved(true);
+    } catch (saveError) {
+      setError(saveError.message || 'Could not save artisan profile.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // props shared by every field
@@ -84,7 +90,7 @@ export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
         <div className="artisan-success-banner">
           <span className="artisan-success-message">
             <CheckCircle2 className="artisan-icon artisan-icon-success" />
-            Profile preview updated for this session only; the current backend does not save these profile edits.
+            Artisan profile and Meet the Maker story saved.
           </span>
           <button type="button" onClick={onPreviewMeetTheMaker} className="artisan-text-link artisan-link-strong">
             Preview Meet the Maker →
@@ -102,11 +108,13 @@ export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
           <button type="button" onClick={onPreviewMeetTheMaker} className="btn-secondary artisan-small-button">
             <BookOpen className="artisan-icon" /> Preview
           </button>
-          <button type="submit" className="btn-primary artisan-small-button">
-            <Save className="artisan-icon" /> Update Preview
+          <button type="submit" className="btn-primary artisan-small-button" disabled={saving}>
+            <Save className="artisan-icon" /> {saving ? 'Saving...' : 'Save Profile'}
           </button>
         </div>
       </div>
+
+      {error && <p className="artisan-login-error" role="alert">{error}</p>}
 
       {/* basic details */}
       <div className="card artisan-profile-section">
@@ -128,7 +136,7 @@ export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
               <Field {...f('location')} label="Location / Village" icon={MapPin} required placeholder="e.g. Varkala, Kerala" />
               <Field
                 {...f('yearsOfExperience')}
-                value={profile.yearsOfExperience || 1}
+                value={profile.yearsOfExperience ?? ''}
                 label="Years of Craft Experience"
                 icon={Award}
                 type="number"
@@ -181,22 +189,6 @@ export function ProfileForm({ initialProfile, onSave, onPreviewMeetTheMaker }) {
           required
           placeholder="Describe your process, your materials, and the care in each piece..."
         />
-        <Field
-          {...f('video')}
-          label="Workshop Video URL (optional)"
-          icon={Video}
-          type="url"
-          placeholder="https://www.youtube.com/embed/..."
-        />
-      </div>
-
-      {/* contact info */}
-      <div className="card artisan-contact-section">
-        <h4 className="artisan-eyebrow">Contact Records</h4>
-        <div className="artisan-contact-grid">
-          <Field {...f('email')} label="Email" icon={Mail} type="email" />
-          <Field {...f('phone')} label="Phone" icon={Phone} type="tel" />
-        </div>
       </div>
     </form>
   );
@@ -210,7 +202,7 @@ export function MeetTheMaker({ artisan, onEditProfile, showEditButton = true }) 
   // the three small facts under the name
   const facts = [
     { icon: MapPin, text: artisan.location },
-    { icon: Calendar, text: `${artisan.yearsOfExperience} Years Craft Experience` },
+    ...(artisan.yearsOfExperience ? [{ icon: Calendar, text: `${artisan.yearsOfExperience} Years Craft Experience` }] : []),
     { icon: Sparkles, text: artisan.craftSpeciality },
   ];
 
@@ -228,9 +220,6 @@ export function MeetTheMaker({ artisan, onEditProfile, showEditButton = true }) 
     },
   ];
 
-  // only YouTube / Vimeo links can be embedded, anything else becomes a plain link
-  const canEmbed = /youtube\.com|vimeo\.com/.test(artisan.video || '');
-
   return (
     <div className="card artisan-maker-card">
       {/* top banner */}
@@ -247,7 +236,7 @@ export function MeetTheMaker({ artisan, onEditProfile, showEditButton = true }) 
 
         <div className="artisan-maker-actions">
           <span className="artisan-verified-badge">
-            <CheckCircle2 className="artisan-icon artisan-icon-verified" /> Verified Master Artisan
+            <CheckCircle2 className="artisan-icon artisan-icon-verified" /> Artisan profile
           </span>
           {showEditButton && onEditProfile && (
             <button
@@ -301,42 +290,6 @@ export function MeetTheMaker({ artisan, onEditProfile, showEditButton = true }) 
           ))}
         </div>
 
-        {/* workshop video, shown only if the artisan added one */}
-        {artisan.video && (
-          <div className="artisan-maker-video-section">
-            <div className="artisan-video-heading">
-              <h4 className="artisan-story-title">
-                <Video className="artisan-icon artisan-icon-accent" /> Workshop & Craft Demonstration Video
-              </h4>
-              <span className="artisan-muted artisan-small-text">Shows hands-on weaving & carving techniques</span>
-            </div>
-
-            <div className="artisan-video-frame">
-              {canEmbed ? (
-                <iframe
-                  src={artisan.video}
-                  title="Artisan craft workshop video"
-                  className="artisan-video-embed"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <div className="artisan-video-link-panel">
-                  <Video className="artisan-video-link-icon" />
-                  <p className="artisan-field-label">Video Link</p>
-                  <a
-                    href={artisan.video}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="artisan-video-link"
-                  >
-                    {artisan.video}
-                  </a>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

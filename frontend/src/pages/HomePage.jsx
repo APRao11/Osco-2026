@@ -8,6 +8,7 @@ import SectionHeading from '../components/SectionHeading';
 import { crafts as sampleCrafts } from '../data/crafts';
 import { getCraftSlug } from '../data/craftRoutes';
 import { products as sampleProducts } from '../data/products';
+import { API_ROOT } from '../data/artisanApi.js';
 
 export default function HomePage() {
   const [crafts, setCrafts] = useState([]);
@@ -25,8 +26,8 @@ export default function HomePage() {
     async function loadMarketplace() {
       try {
         const [craftResponse, productResponse] = await Promise.all([
-          fetch('http://localhost:3000/api/crafts'),
-          fetch('http://localhost:3000/api/products'),
+          fetch(`${API_ROOT}/crafts`),
+          fetch(`${API_ROOT}/products`),
         ]);
         if (!craftResponse.ok || !productResponse.ok) {
           throw new Error('Could not load live marketplace data.');

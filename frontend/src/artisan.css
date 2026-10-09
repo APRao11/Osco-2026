@@ -289,13 +289,6 @@
 .artisan-maker-story { display: grid; align-content: start; gap: .55rem; padding: 1.15rem; background: rgba(245, 235, 221, .42); border: 1px solid rgba(216, 199, 178, .8); border-radius: .75rem; }
 .artisan-story-title { display: flex; align-items: center; gap: .5rem; margin: 0; color: var(--artisan-primary); font: 700 .9rem/1.35 Georgia, serif; }
 .artisan-story-copy { margin: 0; color: var(--artisan-ink); font-size: .75rem; line-height: 1.65; white-space: pre-line; }
-.artisan-maker-video-section { display: grid; gap: .8rem; padding-top: 1.1rem; border-top: 1px solid rgba(216, 199, 178, .75); }
-.artisan-video-heading { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
-.artisan-video-frame { width: 100%; aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(47, 41, 36, .08); border: 1px solid var(--artisan-border); border-radius: .75rem; box-shadow: inset 0 2px 5px rgba(47, 41, 36, .08); }
-.artisan-video-embed { width: 100%; height: 100%; border: 0; }
-.artisan-video-link-panel { display: grid; justify-items: center; gap: .5rem; padding: 1.5rem; text-align: center; }
-.artisan-video-link-icon { width: 2rem; height: 2rem; margin-inline: auto; color: var(--artisan-primary); opacity: .7; }
-.artisan-video-link { display: block; max-width: min(100%, 28rem); overflow: hidden; color: var(--artisan-primary); font-size: .75rem; text-decoration: underline; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Product list cards and detail modal */
 .artisan-product-card { overflow: hidden; transition: border-color .18s ease, box-shadow .18s ease; }
@@ -443,7 +436,6 @@
   .artisan-maker-banner { align-items: flex-start; flex-direction: column; }
   .artisan-maker-actions { width: 100%; }
   .artisan-maker-actions > * { flex: 1; justify-content: center; }
-  .artisan-video-heading { align-items: flex-start; flex-direction: column; }
   .artisan-product-grid { grid-template-columns: 1fr; }
   .artisan-publish-settings { align-items: flex-start; flex-direction: column; }
   .artisan-form-heading-actions { width: 100%; }
@@ -456,4 +448,27 @@
   .artisan-sample-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .artisan-profile-tabs { width: 100%; }
   .artisan-profile-tab { flex: 1; justify-content: center; padding-inline: .45rem; }
+}
+
+.artisan-orders-section { display: grid; gap: 1rem; }
+.artisan-orders-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: .75rem; border-bottom: 1px solid var(--artisan-border); }
+.artisan-orders-heading h2, .artisan-orders-heading p { margin: 0; }
+.artisan-orders-list { display: grid; gap: .8rem; }
+.artisan-order-card { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(11rem, 1fr) minmax(10rem, .7fr); gap: 1rem; align-items: center; padding: 1rem; background: var(--artisan-paper); }
+.artisan-order-product { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.artisan-order-product img { flex: 0 0 auto; width: 4.2rem; height: 4.2rem; border: 1px solid var(--artisan-border); border-radius: .55rem; object-fit: cover; }
+.artisan-order-product h3 { margin: 0 0 .25rem; color: var(--artisan-primary); font: 700 .95rem Georgia, serif; }
+.artisan-order-product p, .artisan-order-buyer span { display: block; margin: .18rem 0; color: var(--artisan-muted); font-size: .72rem; line-height: 1.4; }
+.artisan-order-buyer { display: grid; gap: .2rem; overflow-wrap: anywhere; font-size: .75rem; }
+.artisan-order-total { display: grid; justify-items: start; gap: .45rem; color: var(--artisan-primary); font-size: .9rem; }
+.artisan-order-total select { max-width: 100%; padding: .45rem .55rem; color: var(--artisan-ink); border: 1px solid var(--artisan-border); border-radius: .5rem; background: #fff; font: inherit; font-size: .72rem; }
+.artisan-order-empty { padding: 1.2rem; background: var(--artisan-paper); }
+
+@media (max-width: 800px) {
+  .artisan-order-card { grid-template-columns: 1fr 1fr; }
+  .artisan-order-product { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .artisan-order-card { grid-template-columns: 1fr; }
+  .artisan-order-product { grid-column: auto; }
 }

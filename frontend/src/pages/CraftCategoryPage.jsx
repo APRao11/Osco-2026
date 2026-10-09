@@ -6,6 +6,7 @@ import SectionHeading from '../components/SectionHeading';
 import { getCraftSlug } from '../data/craftRoutes';
 import { crafts as sampleCrafts } from '../data/crafts';
 import { products as sampleProducts } from '../data/products';
+import { API_ROOT } from '../data/artisanApi.js';
 
 export default function CraftCategoryPage() {
   const { craftSlug } = useParams();
@@ -25,8 +26,8 @@ export default function CraftCategoryPage() {
       setError('');
       try {
         const [craftsResponse, productsResponse] = await Promise.all([
-          fetch('http://localhost:3000/api/crafts'),
-          fetch('http://localhost:3000/api/products'),
+          fetch(`${API_ROOT}/crafts`),
+          fetch(`${API_ROOT}/products`),
         ]);
         if (!craftsResponse.ok || !productsResponse.ok) {
           throw new Error('Could not load this craft collection.');
@@ -43,7 +44,7 @@ export default function CraftCategoryPage() {
         if (!matchedCraft) throw new Error('Craft not found.');
 
         // Keep the existing single-craft API lookup, resolving the buyer-facing slug first.
-        const detailResponse = await fetch(`http://localhost:3000/api/crafts/${matchedCraft.id}`);
+        const detailResponse = await fetch(`${API_ROOT}/crafts/${matchedCraft.id}`);
         const detailCraft = detailResponse.ok ? await detailResponse.json() : matchedCraft;
         const normalizedProducts = productData.map((product) => {
           const productCraft = craftData.find(

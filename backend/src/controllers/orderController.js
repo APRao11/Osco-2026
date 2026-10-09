@@ -117,6 +117,7 @@ function createOrder(req, res) {
 function updateOrderStatus(req, res) {
   const orderId = Number(req.params.id);
   const { status } = req.body || {};
+  const artisanId = req.body?.artisan_id === undefined ? null : Number(req.body.artisan_id);
 
   if (!Number.isInteger(orderId) || orderId < 1) {
     return res.status(400).json({ error: "Invalid order ID" });
@@ -124,9 +125,14 @@ function updateOrderStatus(req, res) {
   if (typeof status !== "string" || !allowedStatuses.has(status)) {
     return res.status(400).json({ error: "Invalid order status" });
   }
+  if (artisanId !== null && (!Number.isInteger(artisanId) || artisanId < 1)) {
+    return res.status(400).json({ error: "Invalid artisan ID" });
+  }
 
   try {
-    const result = db.prepare("UPDATE orders SET status = ? WHERE id = ?").run(status, orderId);
+    const result = artisanId === null
+      ? db.prepare("UPDATE orders SET status = ? WHERE id = ?").run(status, orderId)
+      : db.prepare("UPDATE orders SET status = ? WHERE id = ? AND artisan_id = ?").run(status, orderId, artisanId);
     if (result.changes === 0) return res.status(404).json({ error: "Order not found" });
     const order = db.prepare(`${orderQuery} WHERE orders.id = ?`).get(orderId);
     return res.json({ message: "Order status updated successfully", order });

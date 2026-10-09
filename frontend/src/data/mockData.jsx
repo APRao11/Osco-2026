@@ -17,7 +17,6 @@ export const initialArtisanProfile = {
   craftSpeciality: 'Handwoven Coir & Carved Coconut Shell Ware',
   craftBackground: 'Learned the rhythmic loom and manual carving from my grandmother in the palm groves along the Arabian Sea. For over 18 years, our family has transformed fallen coconuts and golden coir fibers into functional coastal heirlooms.',
   makerStory: 'Every morning begins with the low tide. We collect mature coconut shells discarded by local harvesters, sand them smooth using beach sand and river stones, and interlock them with braided coir cordage soaked in vegetable extracts. When you hold a piece from our workshop, you feel the patience of the tide and the scent of sun-dried coconut shell.',
-  video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   email: 'meera.crafts@coastalheritage.org',
   phone: '+91 98471 23456',
   yearsOfExperience: 18,

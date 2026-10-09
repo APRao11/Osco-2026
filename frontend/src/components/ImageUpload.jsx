@@ -42,6 +42,10 @@ export function ImageUpload({
       alert('Please upload a valid image file (PNG, JPG, WEBP).');
       return;
     }
+    if (file.size > 3.5 * 1024 * 1024) {
+      alert('Please choose an image smaller than 3.5 MB so it can be saved by the current API.');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {

@@ -1214,3 +1214,38 @@ select {
     box-shadow: none;
   }
 }
+
+.product-detail-page { display: grid; gap: 2rem; }
+.product-detail-back { width: fit-content; color: var(--primary); font-weight: 600; }
+.product-detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, .85fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
+.product-detail-image { overflow: hidden; border: 1px solid var(--border); border-radius: 22px; background: var(--surface); box-shadow: 0 18px 38px var(--shadow); }
+.product-detail-image img { width: 100%; max-height: 620px; aspect-ratio: 1 / .88; object-fit: cover; }
+.product-detail-copy h1 { margin: .5rem 0; font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.08; }
+.product-detail-copy > p:not(.eyebrow) { color: var(--muted); line-height: 1.65; }
+.product-detail-price { color: var(--primary) !important; font: 700 clamp(1.8rem, 4vw, 2.5rem) 'Lora', Georgia, serif; }
+.product-detail-stock { font-weight: 650; }
+.product-order-button { margin-top: .8rem; border: 0; cursor: pointer; }
+.product-order-button:disabled { opacity: .55; cursor: not-allowed; }
+.product-detail-story { padding: clamp(1.2rem, 3vw, 2rem); border: 1px solid var(--border); border-radius: 20px; background: rgba(255, 249, 240, .72); }
+.product-detail-story h2 { margin: .4rem 0 1rem; color: var(--primary); }
+.product-detail-story-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
+.product-detail-story-item { padding: 1rem; border: 1px solid rgba(216, 199, 178, .8); border-radius: 14px; background: var(--surface); }
+.product-detail-story-item h3 { margin: 0 0 .4rem; color: var(--primary); font-size: 1rem; }
+.product-detail-story-item p { margin: 0; color: var(--muted); line-height: 1.65; white-space: pre-line; }
+.product-maker-section { display: grid; gap: 1rem; }
+.buyer-action-card { display: grid; gap: .85rem; padding: clamp(1.2rem, 3vw, 1.8rem); border: 1px solid var(--border); border-radius: 18px; background: rgba(255, 249, 240, .8); }
+.buyer-action-card h2 { margin: 0; color: var(--primary); }
+.buyer-action-card > p { margin: 0; color: var(--muted); line-height: 1.5; }
+.buyer-action-card label { display: grid; gap: .35rem; color: var(--text); font-size: .9rem; font-weight: 600; }
+.buyer-action-card input, .buyer-action-card textarea, .buyer-action-card select { width: 100%; padding: .7rem .8rem; color: var(--text); border: 1px solid var(--border); border-radius: 9px; background: #fff; font: inherit; }
+.buyer-action-card textarea { resize: vertical; }
+.buyer-form-error, .buyer-form-success { padding: .75rem; border-radius: 9px; }
+.buyer-form-error { color: #881337 !important; background: #fff1f2; }
+.buyer-form-success { color: #14532d !important; background: #dcfce7; }
+
+@media (max-width: 900px) {
+  .product-detail-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .product-detail-story-grid { grid-template-columns: 1fr; }
+}

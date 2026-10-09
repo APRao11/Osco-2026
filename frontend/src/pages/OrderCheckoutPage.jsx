@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { createLocalOrder, saveServerOrder } from '../data/orderStorage';
+import { saveServerOrder } from '../data/orderStorage';
+import { API_ROOT } from '../data/artisanApi.js';
 
 export default function OrderCheckoutPage() {
   const { productId } = useParams();
@@ -16,7 +17,7 @@ export default function OrderCheckoutPage() {
 
     async function loadProduct() {
       try {
-        const response = await fetch(`http://localhost:3000/api/products/${productId}`);
+        const response = await fetch(`${API_ROOT}/products/${productId}`);
         if (!response.ok) {
           throw new Error(response.status === 404 ? 'Product not found.' : 'Could not load product.');
         }
@@ -49,7 +50,7 @@ export default function OrderCheckoutPage() {
 
     let response;
     try {
-      response = await fetch('http://localhost:3000/api/orders', {
+      response = await fetch(`${API_ROOT}/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -61,13 +62,8 @@ export default function OrderCheckoutPage() {
         }),
       });
     } catch {
-      try {
-        const localOrder = createLocalOrder({ ...form, quantity, product });
-        navigate(`/orders/${localOrder.id}/confirmation`, { state: { order: localOrder } });
-      } catch {
-        setError('The backend is unavailable and this browser could not save the demo order.');
-        setSubmitting(false);
-      }
+      setError('The backend is unavailable. Your order was not placed; please try again when the service is available.');
+      setSubmitting(false);
       return;
     }
 
@@ -169,7 +165,7 @@ export default function OrderCheckoutPage() {
           />
 
           <p className="checkout-demo-note">
-            <strong>Demo checkout:</strong> payment is simulated and this order is saved only in this browser.
+            <strong>Demo checkout:</strong> payment is simulated. Successful orders are recorded by the marketplace backend.
           </p>
           {error ? <p className="order-error" role="alert">{error}</p> : null}
           <button className="primary-button checkout-submit" type="submit" disabled={submitting}>
