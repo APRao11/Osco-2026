@@ -128,7 +128,7 @@ function ArtisanWorkspace() {
 
   useEffect(() => {
     if (artisan?.id) {
-      reloadWorkspaceData(artisan.id);
+      reloadWorkspaceData(artisan?.id);
     } else {
       setProducts([]);
       setCrafts([]);
@@ -153,11 +153,11 @@ function ArtisanWorkspace() {
   const saveProduct = async (product) => {
     const { id, ...payload } = product;
     if (id) {
-      await updateProduct(id, productPayload(payload), artisan.id);
+      await updateProduct(id, productPayload(payload), artisan?.id);
     } else {
       await createProduct(productPayload(payload));
     }
-    const refreshed = await reloadWorkspaceData(artisan.id);
+    const refreshed = await reloadWorkspaceData(artisan?.id);
     setMutationNotice(
       refreshed
         ? `Product ${id ? 'updated' : 'created'} successfully.`
@@ -168,7 +168,7 @@ function ArtisanWorkspace() {
   };
 
   const saveProfile = async (profile) => {
-    const saved = await updateArtisanProfile(artisan.id, artisanProfilePayload(profile));
+    const saved = await updateArtisanProfile(artisan?.id, artisanProfilePayload(profile));
     const workspaceArtisan = createWorkspaceArtisan(saved);
     setArtisan(workspaceArtisan);
     window.sessionStorage.setItem(ARTISAN_SESSION_KEY, JSON.stringify(workspaceArtisan));
@@ -206,7 +206,7 @@ function ArtisanWorkspace() {
         {!isLoginPage && workspaceError && (
           <div className="artisan-login-error" role="alert">
             <p>{workspaceError}</p>
-            <button type="button" className="artisan-text-link" onClick={() => reloadWorkspaceData(artisan.id)}>Retry</button>
+            <button type="button" className="artisan-text-link" onClick={() => reloadWorkspaceData(artisan?.id)}>Retry</button>
           </div>
         )}
         <Routes>
@@ -216,7 +216,7 @@ function ArtisanWorkspace() {
           />
           <Route
             path="dashboard"
-            element={<ArtisanDashboard artisan={artisan} artisanId={artisan.id} products={products} onNavigate={navigateTo} onEditProduct={startEditingProduct} onViewProduct={setViewingProduct} />}
+            element={<ArtisanDashboard artisan={artisan} artisanId={artisan?.id} products={products} onNavigate={navigateTo} onEditProduct={startEditingProduct} onViewProduct={setViewingProduct} />}
           />
           <Route path="profile" element={<ArtisanProfile artisan={artisan} onSaveProfile={saveProfile} />} />
           <Route
@@ -230,8 +230,8 @@ function ArtisanWorkspace() {
           <Route
             path="products"
             element={<ManageProducts products={products} crafts={crafts} artisan={artisan} loading={productsLoading} notice={mutationNotice} onNoticeDismiss={() => setMutationNotice('')} onAddProduct={() => navigateTo('add-product')} onEditProduct={startEditingProduct} onDeleteProduct={async (id) => {
-              await deleteProduct(id, artisan.id);
-              const refreshed = await reloadWorkspaceData(artisan.id);
+              await deleteProduct(id, artisan?.id);
+              const refreshed = await reloadWorkspaceData(artisan?.id);
               setMutationNotice(refreshed ? 'Product deleted successfully.' : 'Product deleted from SQLite, but the list could not be refreshed. Retry the load.');
             }} />}
           />
